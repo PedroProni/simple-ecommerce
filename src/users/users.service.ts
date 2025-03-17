@@ -1,16 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { hash, genSalt } from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
+import { hash, genSalt, compare } from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private jwtService: JwtService
+  ) {}
 
   private async hashPassword(password: string) {
     const salt = await genSalt(10);
@@ -21,7 +25,23 @@ export class UsersService {
     createUserDto.password = await this.hashPassword(createUserDto.password);
     const createUser = new this.userModel(createUserDto);
     const result = await createUser.save();
-    return new User(result.toJSON());
+    const user = new User(result.toJSON());
+    const token = await this.jwtService.signAsync({ sub: user._id, email: user.email });
+    return { "access_token": token };
+  }
+
+  async login(email: string, password: string,): Promise<{ access_token: string }> {
+    const user = await this.userModel.findOne({ email }).exec();
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    if (!await compare(password, user.password)) {
+      throw new UnauthorizedException();
+    }
+    const payload = { sub: user._id, email: user.email };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 
   async findAll() {

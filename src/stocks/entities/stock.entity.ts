@@ -2,14 +2,14 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Expose } from "class-transformer";
 import { Types } from "mongoose";
 
-@Schema()
+@Schema({ versionKey: false , timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Stock {
     @Expose({ name: 'stock_id' })
-    @Prop({ default: () => new Types.ObjectId() })
+    @Prop({ default: () => new Types.ObjectId(), unique: true })
     _id: string;
     
     @Expose()
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true })
     sku: string;
      
     @Expose()

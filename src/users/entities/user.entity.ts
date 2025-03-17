@@ -3,34 +3,34 @@ import { Expose } from 'class-transformer';
 import { Types } from 'mongoose';
 
 export enum UserRole {
-    ADMIN = 'admin',
-    USER = 'user',
+  ADMIN = 'admin',
+  USER = 'user',
 }
 
 @Schema()
 export class User {
-    @Expose({ name: 'user_id' })
-    @Prop({ default: () => new Types.ObjectId() })
-    _id: string;
-    
-    @Expose()
-    @Prop({ required: true, unique: true })
-    email: string;
-     
-    @Expose()
-    @Prop({ required: true })
-    name: string;
-    
-    @Prop({ required: true })
-    password: string;
+  @Expose({ name: 'user_id' })
+  @Prop({ default: () => new Types.ObjectId() })
+  _id: string;
 
-    @Expose()
-    @Prop()
-    role: UserRole; 
+  @Expose()
+  @Prop({ required: true })
+  name: string;
 
-    constructor(init: User) {
-        Object.assign(this, init);
-    }
+  @Expose()
+  @Prop({ required: true, unique: true })
+  email: string;
+
+  @Prop({ required: true })
+  password: string;
+
+  @Expose()
+  @Prop()
+  role: UserRole;
+
+  constructor(init: User) {
+    Object.assign(this, init);
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Expose } from "class-transformer";
 import { Types } from "mongoose";
 
-@Schema()
+@Schema({ versionKey: false , timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Price {
     @Expose({ name: 'price_id' })
-    @Prop({ default: () => new Types.ObjectId() })
+    @Prop({ default: () => new Types.ObjectId(), unique: true })
     _id: string;
     
     @Expose()

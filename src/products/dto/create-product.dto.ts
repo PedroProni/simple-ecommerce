@@ -29,11 +29,4 @@ export class CreateProductDto {
     @IsString()
     um: string;
 
-    @Expose()
-    @ApiProperty()
-    price: number;
-
-    @Expose()
-    @ApiProperty()
-    stock: number;
 }
