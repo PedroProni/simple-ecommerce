@@ -38,8 +38,8 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
       request['user'] = payload;
-    } catch(e) {
-      throw new UnauthorizedException();
+    } catch (e) {
+      throw new UnauthorizedException('Invalid token or secret');
     }
     return true;
   }

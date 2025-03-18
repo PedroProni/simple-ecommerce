@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 
 @Schema({ versionKey: false , timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 export class Price {
-    @Expose({ name: 'price_id' })
+    @Expose()
     @Prop({ default: () => new Types.ObjectId(), unique: true })
     _id: string;
     
