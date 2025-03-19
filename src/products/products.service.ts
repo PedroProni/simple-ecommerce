@@ -1,44 +1,89 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { plainToInstance } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import { Product } from './entities/product.entity';
-
 
 @Injectable()
 export class ProductsService {
-  constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
+  constructor(
+    @InjectModel(Product.name) private productModel: Model<Product>,
+  ) {}
 
   async create(createProductDto: CreateProductDto) {
-    const createProduct = new this.productModel(createProductDto);
-    const result = await createProduct.save();
-    return plainToInstance(Product, result.toJSON());
+    try {
+      const createProduct = new this.productModel(createProductDto);
+      const product = await createProduct.save();
+      return instanceToPlain(new Product(product.toJSON()));
+    } catch (e) {
+      if (e.code === 11000) {
+        throw new ConflictException('Product already exists');
+      }
+      throw new InternalServerErrorException();
+    }
   }
 
   async findAll() {
-    const products = await this.productModel.find().populate('stocks').populate('prices').exec();
-    return products.map(product => plainToInstance(Product, product.toJSON()));
+    try {
+      const products = await this.productModel
+        .find()
+        .populate('stocks')
+        .populate('prices')
+        .exec();
+      return products.map((product) =>
+        instanceToPlain(new Product(product.toJSON())),
+      );
+    } catch (e) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async findOne(id: string) {
-    const product = await this.productModel.findById(id).populate('stocks').populate('prices').exec();
-    if (!product) {
-      throw new NotFoundException('Product not found');
+    try {
+      const product = await this.productModel
+        .findById(id)
+        .populate('stocks')
+        .populate('prices')
+        .exec();
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+      return instanceToPlain(new Product(product.toJSON()));
+    } catch (e) {
+      throw new InternalServerErrorException();
     }
-    return plainToInstance(Product, product.toJSON());
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    const updatedProduct = await this.productModel.updateOne({ _id: id }, updateProductDto).exec();
-    if (!updatedProduct) {
-      throw new NotFoundException('Product not found');
+    try {
+      const product = await this.productModel
+        .updateOne({ _id: id }, updateProductDto)
+        .exec();
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+      return product;
+    } catch (e) {
+      throw new InternalServerErrorException();
     }
-    return plainToInstance(Product, updatedProduct);
   }
 
-  remove(id: string) {
-    return this.productModel.deleteOne({ _id: id }).exec();
+  async remove(id: string) {
+    try {
+      const product = await this.productModel.deleteOne({ _id: id }).exec();
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+      return product;
+    } catch (e) {
+      throw new InternalServerErrorException();
+    }
   }
 }

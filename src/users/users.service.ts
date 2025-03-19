@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Model } from 'mongoose';
@@ -22,15 +22,22 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    createUserDto.password = await this.hashPassword(createUserDto.password);
-    const createUser = new this.userModel(createUserDto);
-    const result = await createUser.save();
-    const user = new User(result.toJSON());
-    const token = await this.jwtService.signAsync({ sub: user._id, email: user.email });
-    return { "access_token": token };
+    try {
+      createUserDto.password = await this.hashPassword(createUserDto.password);
+      const createUser = new this.userModel(createUserDto);
+      const result = await createUser.save();
+      const user = new User(result.toJSON());
+      const token = await this.jwtService.signAsync({ sub: user._id, email: user.email });
+      return { "token": token };
+    } catch (e) {
+      if (e.code === 11000) {
+        throw new ConflictException('User already exists');
+      }
+      throw new UnauthorizedException();
+    }
   }
 
-  async login(email: string, password: string,): Promise<{ access_token: string }> {
+  async login(email: string, password: string,): Promise<{ token: string }> {
     const user = await this.userModel.findOne({ email }).exec();
     if (!user) {
       throw new UnauthorizedException();
@@ -40,7 +47,7 @@ export class UsersService {
     }
     const payload = { sub: user._id, email: user.email };
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      token: await this.jwtService.signAsync(payload),
     };
   }
 

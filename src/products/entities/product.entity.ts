@@ -16,7 +16,7 @@ export enum Statuses {
   toObject: { virtuals: true, versionKey: false },
 })
 export class Product {
-  @Expose()
+  @Expose({ name: 'product_id'})
   @Prop({ default: () => new Types.ObjectId() })
   _id: string;
 
