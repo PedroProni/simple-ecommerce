@@ -10,6 +10,9 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { instanceToPlain } from 'class-transformer';
 import { Product } from './entities/product.entity';
+import { Price } from 'src/prices/entities/price.entity';
+import { log } from 'console';
+import { Stock } from 'src/stocks/entities/stock.entity';
 
 @Injectable()
 export class ProductsService {
@@ -37,10 +40,17 @@ export class ProductsService {
         .populate('stocks')
         .populate('prices')
         .exec();
+      
       return products.map((product) =>
-        instanceToPlain(new Product(product.toJSON())),
+      {
+        const jsonProduct = product.toJSON();
+        jsonProduct.prices = jsonProduct.prices.map(price => new Price(price));
+        jsonProduct.stocks = jsonProduct.stocks.map(stock => new Stock(stock));
+        return instanceToPlain(new Product(jsonProduct))
+      }
       );
     } catch (e) {
+      console.log(e)
       throw new InternalServerErrorException();
     }
   }

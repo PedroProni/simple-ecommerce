@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 import { Stock } from 'src/stocks/entities/stock.entity';
 import { Price } from 'src/prices/entities/price.entity';
@@ -41,10 +41,12 @@ export class Product {
   um: string;
 
   @Expose()
-  price: Price[];
+  @Type(() => Price)
+  prices: Price[];
 
   @Expose()
-  stock: Stock[];
+  @Type(() => Stock)
+  stocks: Stock[];
 
   constructor(init: Product) {
     Object.assign(this, init);
