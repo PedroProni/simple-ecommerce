@@ -6,11 +6,6 @@ export class ImageDto {
     @Expose()
     @ApiProperty()
     @IsString()
-    sku: string;
-
-    @Expose()
-    @ApiProperty()
-    @IsString()
     url: string;
 
     @Expose()
