@@ -18,10 +18,14 @@ export class StocksService {
   async create(createStockDto: CreateStockDto) {
     try {
       const createStock = new this.stockModel(createStockDto);
+      const stock_already_exists = await this.stockModel.find({ sku: createStock.sku, warehouse: createStock.warehouse }).exec();
+      if (stock_already_exists.length > 0) {
+        throw new ConflictException('Stock already exists');
+      }
       const stock = await createStock.save();
       return instanceToPlain(new Stock(stock.toJSON()));
     } catch (e) {
-      if (e.code === 11000) {
+      if (e.code === 11000 || e.response.message === 'Stock already exists') {
         throw new ConflictException('Stock already exists');
       }
       throw new InternalServerErrorException();

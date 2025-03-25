@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Expose, Type } from 'class-transformer';
 import { Types } from 'mongoose';
+import { Image } from 'src/products/entities/image.entity';
 import { Stock } from 'src/stocks/entities/stock.entity';
 import { Price } from 'src/prices/entities/price.entity';
 
@@ -39,6 +40,10 @@ export class Product {
   @Expose()
   @Prop({})
   um: string;
+
+  @Expose()
+  @Type(() => Image)
+  images: Image[];
 
   @Expose()
   @Type(() => Price)
