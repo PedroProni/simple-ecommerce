@@ -10,11 +10,6 @@ export class ItemsDto {
 
   @Expose()
   @ApiProperty()
-  @IsString()
-  name: string;
-
-  @Expose()
-  @ApiProperty()
   @IsNumber()
   unity_price: number;
 
