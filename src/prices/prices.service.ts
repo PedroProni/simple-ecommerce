@@ -61,28 +61,42 @@ export class PricesService {
       }
       return instanceToPlain(new Price(price.toJSON()));
     } catch (e) {
+      if (e.status === 404) {
+        throw new NotFoundException('Price not found');
+      }
       throw new InternalServerErrorException();
     }
   }
 
   async update(id: string, updatePriceDto: UpdatePriceDto) {
     try {
-      const price = await this.priceModel
-        .updateOne({ _id: id }, updatePriceDto)
-        .exec();
+      const price = await this.priceModel.findById(id).exec();
       if (!price) {
         throw new NotFoundException('Product not found');
       }
-      return price;
+      await this.priceModel.updateOne({ _id: id }, updatePriceDto).exec();
+      const updated_price = await this.priceModel.findById(id).exec();
+      return updated_price;
     } catch (e) {
+      if (e.status === 404) {
+        throw new NotFoundException('Price not found');
+      }
       throw new InternalServerErrorException();
     }
   }
 
   async remove(id: string) {
     try {
-      return await this.priceModel.deleteOne({ _id: id }).exec();
+      const price = await this.priceModel.findById(id).exec();
+      if (!price) {
+        throw new NotFoundException('Price not found');
+      }
+      await this.priceModel.deleteOne({ _id: id }).exec();
+      return price;
     } catch (e) {
+      if (e.status === 404) {
+        throw new NotFoundException('Price not found');
+      }
       throw new InternalServerErrorException();
     }
   }

@@ -85,7 +85,8 @@ export class ProductsService {
         throw new NotFoundException('Product not found');
       }
       await this.productModel.updateOne({ _id: id }, updateProductDto).exec();
-      return product;
+      const updated_product = await this.productModel.findById(id).exec();
+      return updated_product;
     } catch (e) {
       if(e.status === 404) {
         throw new NotFoundException('Product not found');
