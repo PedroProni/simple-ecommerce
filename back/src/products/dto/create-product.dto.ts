@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Expose, Type } from "class-transformer";
 import { IsEnum, IsString, ValidateNested } from "class-validator";
 import { Statuses } from "../entities/product.entity";
-import { ImageDto } from "../dto/image.dto"
+import { ImageDto } from "./image.dto"
 
 export class CreateProductDto {
     @Expose()
