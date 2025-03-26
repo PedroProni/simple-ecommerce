@@ -38,10 +38,15 @@ export class Product {
   status: Statuses;
 
   @Expose()
-  @Prop({})
+  @Prop({ required: true })
   um: string;
 
   @Expose()
+  @Prop({ required: true })
+  brand: string;
+
+  @Expose()
+  @Prop({ required: true })
   @Type(() => Image)
   images: Image[];
 

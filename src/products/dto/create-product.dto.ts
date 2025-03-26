@@ -31,6 +31,11 @@ export class CreateProductDto {
     um: string;
 
     @Expose()
+    @ApiProperty()
+    @IsString()
+    brand: string;
+
+    @Expose()
     @ApiProperty({ type: [ImageDto] })
     @ValidateNested({ each: true })
     @Type(() => ImageDto)

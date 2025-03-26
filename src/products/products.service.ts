@@ -80,26 +80,32 @@ export class ProductsService {
 
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
-      const product = await this.productModel
-        .updateOne({ _id: id }, updateProductDto)
-        .exec();
+      const product = await this.productModel.findById(id).exec();
       if (!product) {
         throw new NotFoundException('Product not found');
       }
+      await this.productModel.updateOne({ _id: id }, updateProductDto).exec();
       return product;
     } catch (e) {
+      if(e.status === 404) {
+        throw new NotFoundException('Product not found');
+      }
       throw new InternalServerErrorException();
     }
   }
 
   async remove(id: string) {
     try {
-      const product = await this.productModel.deleteOne({ _id: id }).exec();
+      const product = await this.productModel.findById(id).exec();
       if (!product) {
         throw new NotFoundException('Product not found');
       }
+      await this.productModel.deleteOne({ _id: id }).exec();
       return product;
     } catch (e) {
+      if(e.status === 404) {
+        throw new NotFoundException('Product not found');
+      }
       throw new InternalServerErrorException();
     }
   }
