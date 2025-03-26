@@ -34,10 +34,12 @@ export class Order {
   status: Statuses;
 
   @Expose()
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Customer' })
   @Type(() => Customer)
   customer_info: Customer;
 
   @Expose()
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Items' }], required: true })
   @Type(() => Items)
   items: Items[];
 
