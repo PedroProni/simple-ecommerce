@@ -3,6 +3,7 @@ import {
   ConflictException,
   NotFoundException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -27,6 +28,12 @@ export class ProductsService {
     } catch (e) {
       if (e.code === 11000) {
         throw new ConflictException('Product already exists');
+      }
+      if (e.errors) {
+        const missingFields = Object.keys(e.errors).map((field) => field);
+        throw new BadRequestException(
+          `Required fields are missing: ${missingFields.join(', ')}`,
+        );
       }
       throw new InternalServerErrorException();
     }

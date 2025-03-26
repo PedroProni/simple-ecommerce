@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -25,8 +26,14 @@ export class StocksService {
       const stock = await createStock.save();
       return instanceToPlain(new Stock(stock.toJSON()));
     } catch (e) {
-      if (e.code === 11000 || e.response.message === 'Stock already exists') {
+      if (e.code === 11000 || e.response?.message === 'Stock already exists') {
         throw new ConflictException('Stock already exists');
+      }
+      if (e.errors) {
+        const missingFields = Object.keys(e.errors).map((field) => field);
+        throw new BadRequestException(
+          `Required fields are missing: ${missingFields.join(', ')}`,
+        );
       }
       throw new InternalServerErrorException();
     }

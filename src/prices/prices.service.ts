@@ -2,7 +2,8 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  ConflictException
+  ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreatePriceDto } from './dto/create-price.dto';
 import { UpdatePriceDto } from './dto/update-price.dto';
@@ -18,15 +19,26 @@ export class PricesService {
   async create(createPriceDto: CreatePriceDto) {
     try {
       const createPrice = new this.priceModel(createPriceDto);
-      const price_already_exists = await this.priceModel.find({ sku:createPrice.sku, price_list_code:createPrice.price_list_code }).exec();
+      const price_already_exists = await this.priceModel
+        .find({
+          sku: createPrice.sku,
+          price_list_code: createPrice.price_list_code,
+        })
+        .exec();
       if (price_already_exists.length > 0) {
-        throw new ConflictException("Price already exists");
+        throw new ConflictException('Price already exists');
       }
       const price = await createPrice.save();
       return instanceToPlain(new Price(price.toJSON()));
     } catch (e) {
-      if (e.code === 11000 || e.response.message === "Price already exists") {
-        throw new ConflictException("Price already exists");
+      if (e.code === 11000 || e.response.message === 'Price already exists') {
+        throw new ConflictException('Price already exists');
+      }
+      if (e.errors) {
+        const missingFields = Object.keys(e.errors).map((field) => field);
+        throw new BadRequestException(
+          `Required fields are missing: ${missingFields.join(', ')}`,
+        );
       }
       throw new InternalServerErrorException();
     }
@@ -36,7 +48,7 @@ export class PricesService {
     try {
       const prices = await this.priceModel.find().exec();
       return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
-    } catch(e) {
+    } catch (e) {
       throw new InternalServerErrorException();
     }
   }
@@ -48,7 +60,7 @@ export class PricesService {
         throw new NotFoundException('Price not found');
       }
       return instanceToPlain(new Price(price.toJSON()));
-    } catch(e) {
+    } catch (e) {
       throw new InternalServerErrorException();
     }
   }
