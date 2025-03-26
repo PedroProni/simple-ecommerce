@@ -35,7 +35,7 @@ export class PricesService {
         throw new ConflictException('Price already exists');
       }
       if (e.errors) {
-        const missingFields = Object.keys(e.errors).map((field) => field);
+        const missingFields = Object.keys(e.errors);
         throw new BadRequestException(
           `Required fields are missing: ${missingFields.join(', ')}`,
         );

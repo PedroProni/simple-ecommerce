@@ -30,7 +30,7 @@ export class StocksService {
         throw new ConflictException('Stock already exists');
       }
       if (e.errors) {
-        const missingFields = Object.keys(e.errors).map((field) => field);
+        const missingFields = Object.keys(e.errors);
         throw new BadRequestException(
           `Required fields are missing: ${missingFields.join(', ')}`,
         );
