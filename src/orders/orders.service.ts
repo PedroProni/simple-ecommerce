@@ -3,6 +3,7 @@ import {
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -23,28 +24,31 @@ export class OrdersService {
     try {
       const createOrder = new this.orderModel(createOrderDto);
       const orderItems = createOrderDto.items;
-      const orderExists = await this.orderModel.find({ increment_id: createOrder.increment_id }).exec();
+      const orderExists = await this.orderModel
+        .find({ increment_id: createOrder.increment_id })
+        .exec();
       if (orderExists.length > 0) {
         throw new ConflictException('Order already exists');
       }
-      for (const item of orderItems) {
-        const stock = await this.stockModel.findOne({
-          sku: item.sku,
-        });
-        if (!stock  || stock.qty < item.quantity) {
-          throw new ConflictException('Not enough stock');
-        }
-        stock.qty -= item.quantity;
-        await stock.save();
-      }
+      await this.verifyStock(orderItems);
+      this.verifyPrice(createOrderDto);
       const order = await createOrder.save();
       return instanceToPlain(new Order(order.toJSON()));
     } catch (e) {
       if (e.code === 11000 || e.response.message === 'Order already exists') {
         throw new ConflictException('Order already exists');
       }
+      if (e.errors) {
+        const missingFields = Object.keys(e.errors);
+        throw new BadRequestException(
+          `Required fields are missing: ${missingFields.join(', ')}`,
+        );
+      }
       if (e.response.message === 'Not enough stock') {
         throw new ConflictException('Not enough stock');
+      }
+      if (e.response.message === 'Total price is incorrect') {
+        throw new ConflictException('Order price is incorrect');
       }
       throw new InternalServerErrorException();
     }
@@ -85,11 +89,66 @@ export class OrdersService {
     }
   }
 
+  async updateStatus(id: string, updateOrderDto: UpdateOrderDto) {
+    try {
+      const order = await this.orderModel.updateOne({ _id: id }, updateOrderDto);
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+      return order;
+    } catch (e) {
+      if (e.errors) {
+        const missingFields = Object.keys(e.errors);
+        throw new BadRequestException(
+          `Required fields are missing: ${missingFields.join(', ')}`,
+        );
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
   remove(id: string) {
     try {
       return this.orderModel.deleteOne({ _id: id }).exec();
     } catch (e) {
       throw new InternalServerErrorException();
     }
+  }
+
+  async verifyStock(items) {
+    for (const item of items) {
+      const stocks = await this.stockModel.find({
+        sku: item.sku,
+        qty: { $gte: item.quantity },
+        status: 'active',
+      }).sort({ priority: 1 }).exec();
+      if (stocks.length === 0) {
+        throw new ConflictException('Not enough stock');
+      }
+      for (const stock of stocks) {
+        let found_stock = false;
+        if (stock.qty >= item.quantity) {
+          stock.qty -= item.quantity;
+          await stock.save();
+          found_stock = true;
+          break;
+        }
+        if (!found_stock) {
+          throw new ConflictException('Not enough stock');
+        }
+      }
+    }
+  }
+
+  verifyPrice(createOrderDto: CreateOrderDto) {
+    const orderItems = createOrderDto.items;
+    let total = 0;
+    for (const item of orderItems) {
+      total += (item.unity_price * item.quantity) - item.discount;
+    }
+    if (total !== createOrderDto.order_total) {
+      throw new ConflictException('Total price is incorrect');
+    }
+
   }
 }
