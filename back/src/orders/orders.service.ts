@@ -31,7 +31,7 @@ export class OrdersService {
       if (orderExists.length > 0) {
         throw new ConflictException('Order already exists');
       }
-      await this.verifyStock(orderItems, createOrderDto);
+      await this.verifyStock(orderItems, createOrder);
       this.verifyPrice(createOrderDto);
       const order = await createOrder.save();
       return instanceToPlain(new Order(order.toJSON()));
@@ -96,8 +96,20 @@ export class OrdersService {
       if (!order) {
         throw new NotFoundException('Order not found');
       }
-      if (updateOrderStatusDto.status === 'canceled' && order.status !== 'canceled' && order.status !== 'refunded') {
-        console.log('TODO: Refund stock');
+      if (
+        updateOrderStatusDto.status === 'canceled' &&
+        order.status !== 'canceled' &&
+        order.status !== 'refunded'
+      ) {
+        for (const stock of order.stock_sources) {
+          const stock_to_refund = await this.stockModel.findById(stock.stock_id).exec();
+          if (stock_to_refund) {
+            stock_to_refund.qty += stock.quantity;
+            await stock_to_refund.save();
+          } else {
+            throw new NotFoundException(`Stock with ID ${stock.stock_id} not found`);
+          }
+        }
       }
       if (order.status === 'canceled' || order.status === 'refunded') {
         throw new ConflictException('Order is already canceled or refunded');
@@ -130,7 +142,7 @@ export class OrdersService {
     }
   }
 
-  async verifyStock(items, createOrderDto: CreateOrderDto) {
+  async verifyStock(items, order) {
     for (const item of items) {
       const stocks = await this.stockModel
         .find({
@@ -149,10 +161,10 @@ export class OrdersService {
           stock.qty -= item.quantity;
           await stock.save();
           found_stock = true;
-            await this.orderModel.updateOne(
-            { increment_id: createOrderDto.increment_id },
-            { $push: { stock_sources: { stock_id: stock._id, quantity: item.quantity } } }
-            );
+          order.stock_sources.push({
+            stock_id: stock._id,
+            quantity: item.quantity,
+          });
           break;
         }
         if (!found_stock) {

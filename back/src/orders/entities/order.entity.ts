@@ -55,6 +55,13 @@ export class Order {
   @Prop()
   order_observation: string;
 
+  @Prop({ 
+    type: [{ stock_id: String, quantity: Number }], 
+    default: [], 
+    _id: false
+  })
+  stock_sources: { stock_id: string; quantity: number }[];
+
 
   constructor(init: Order) {
     Object.assign(this, init);
