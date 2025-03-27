@@ -51,6 +51,11 @@ export class Order {
   @Prop({ required: true })
   order_total: number;
 
+  @Expose()
+  @Prop()
+  order_observation: string;
+
+
   constructor(init: Order) {
     Object.assign(this, init);
   }

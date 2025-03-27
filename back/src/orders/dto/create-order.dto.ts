@@ -35,4 +35,8 @@ export class CreateOrderDto {
   @Expose()
   @ApiProperty()
   order_total: number;
+
+  @Expose()
+  @ApiProperty()
+  order_observation: string;
 }

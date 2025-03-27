@@ -12,6 +12,7 @@ import { instanceToPlain } from 'class-transformer';
 import { Order } from './entities/order.entity';
 import { Model } from 'mongoose';
 import { Stock } from 'src/stocks/entities/stock.entity';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Injectable()
 export class OrdersService {
@@ -30,7 +31,7 @@ export class OrdersService {
       if (orderExists.length > 0) {
         throw new ConflictException('Order already exists');
       }
-      await this.verifyStock(orderItems);
+      await this.verifyStock(orderItems, createOrderDto);
       this.verifyPrice(createOrderDto);
       const order = await createOrder.save();
       return instanceToPlain(new Order(order.toJSON()));
@@ -89,14 +90,28 @@ export class OrdersService {
     }
   }
 
-  async updateStatus(id: string, updateOrderDto: UpdateOrderDto) {
+  async updateStatus(id: string, updateOrderStatusDto: UpdateOrderStatusDto) {
     try {
-      const order = await this.orderModel.updateOne({ _id: id }, updateOrderDto);
+      const order = await this.orderModel.findById(id).exec();
       if (!order) {
         throw new NotFoundException('Order not found');
       }
-      return order;
+      if (updateOrderStatusDto.status === 'canceled' && order.status !== 'canceled' && order.status !== 'refunded') {
+        console.log('TODO: Refund stock');
+      }
+      if (order.status === 'canceled' || order.status === 'refunded') {
+        throw new ConflictException('Order is already canceled or refunded');
+      }
+      await this.orderModel.updateOne({ _id: id }, updateOrderStatusDto);
+      const updated_order = await this.orderModel.findById(id).exec();
+      return updated_order;
     } catch (e) {
+      if (e.response.message === 'Order not found') {
+        throw new NotFoundException('Order not found');
+      }
+      if (e.response.message === 'Order is already canceled or refunded') {
+        throw new ConflictException('Order is already canceled or refunded');
+      }
       if (e.errors) {
         const missingFields = Object.keys(e.errors);
         throw new BadRequestException(
@@ -115,13 +130,16 @@ export class OrdersService {
     }
   }
 
-  async verifyStock(items) {
+  async verifyStock(items, createOrderDto: CreateOrderDto) {
     for (const item of items) {
-      const stocks = await this.stockModel.find({
-        sku: item.sku,
-        qty: { $gte: item.quantity },
-        status: 'active',
-      }).sort({ priority: 1 }).exec();
+      const stocks = await this.stockModel
+        .find({
+          sku: item.sku,
+          qty: { $gte: item.quantity },
+          status: 'active',
+        })
+        .sort({ priority: 1 })
+        .exec();
       if (stocks.length === 0) {
         throw new ConflictException('Not enough stock');
       }
@@ -131,6 +149,10 @@ export class OrdersService {
           stock.qty -= item.quantity;
           await stock.save();
           found_stock = true;
+            await this.orderModel.updateOne(
+            { increment_id: createOrderDto.increment_id },
+            { $push: { stock_sources: { stock_id: stock._id, quantity: item.quantity } } }
+            );
           break;
         }
         if (!found_stock) {
@@ -144,11 +166,10 @@ export class OrdersService {
     const orderItems = createOrderDto.items;
     let total = 0;
     for (const item of orderItems) {
-      total += (item.unity_price * item.quantity) - item.discount;
+      total += item.unity_price * item.quantity - item.discount;
     }
     if (total !== createOrderDto.order_total) {
       throw new ConflictException('Total price is incorrect');
     }
-
   }
 }

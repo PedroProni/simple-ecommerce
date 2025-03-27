@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CustomerDto {
   @Expose()
@@ -30,7 +30,7 @@ export class CustomerDto {
 
   @Expose()
   @ApiProperty()
-  @IsString()
+  @IsNumber()
   number: number;
 
   @Expose()
