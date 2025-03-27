@@ -16,6 +16,9 @@ import { Stock } from './entities/stock.entity';
 export class StocksService {
   constructor(@InjectModel(Stock.name) private stockModel: Model<Stock>) {}
 
+
+  // Methods for managing stocks
+
   async create(createStockDto: CreateStockDto) {
     try {
       const createStock = new this.stockModel(createStockDto);
@@ -53,10 +56,7 @@ export class StocksService {
 
   async findOne(id: string) {
     try {
-      const stock = await this.stockModel.findById(id).exec();
-      if (!stock) {
-        throw new NotFoundException('Stock not found');
-      }
+      const stock = await this.stockExists('_id', id);
       return instanceToPlain(new Stock(stock.toJSON()));
     } catch (e) {
       if (e.response?.message === 'Stock not found') {
@@ -68,10 +68,7 @@ export class StocksService {
 
   async update(id: string, updateStockDto: UpdateStockDto) {
     try {
-      const stock = await this.stockModel.findById(id).exec();
-      if (!stock) {
-        throw new NotFoundException('Stock not found');
-      }
+      await this.stockExists('_id', id);
       await this.stockModel.updateOne({ _id: id }, updateStockDto).exec();
       const updated_stock = await this.stockModel.findById(id).exec();
       return updated_stock;
@@ -91,13 +88,25 @@ export class StocksService {
 
   async remove(id: string) {
     try {
+      await this.stockExists('_id', id);
       return await this.stockModel.deleteOne({ _id: id }).exec();
     } catch (e) {
       throw new InternalServerErrorException();
     }
   }
 
-  async verifyStock(stock) {
+
+  // Helper methods for processing and managing stock-related logic
+
+  async stockExists(key: string, value: string) {
+    const stock = await this.stockModel.find({ [key]: value }).exec();
+    if (!stock) {
+      throw new NotFoundException('Stock not found');
+    }
+    return stock[0];
+  }
+
+  async verifyStock(stock: Stock) {
     if (stock.qty < 0) {
       throw new BadRequestException('Stock quantity must be greater than 0');
     }
@@ -114,4 +123,5 @@ export class StocksService {
       }
     });
   }
+
 }

@@ -21,40 +21,41 @@ export class OrdersService {
     @InjectModel(Stock.name) private stockModel: Model<Stock>,
   ) {}
 
+
+ // Methods for managing orders
+
   async create(createOrderDto: CreateOrderDto) {
     try {
       const createOrder = new this.orderModel(createOrderDto);
       const orderItems = createOrderDto.items;
-      const orderExists = await this.orderModel
-        .find({ increment_id: createOrder.increment_id })
-        .exec();
-      if (orderExists.length > 0) {
-        throw new ConflictException('Order already exists');
-      }
-      await this.verifyStock(orderItems, createOrder);
+
+      await this.orderExists('increment_id', createOrderDto.increment_id);
+      await this.verifyStock(orderItems, createOrder); 
       this.verifyPrice(createOrderDto);
+
       const order = await createOrder.save();
+
       return instanceToPlain(new Order(order.toJSON()));
     } catch (e) {
       if (e.code === 11000 || e.response.message === 'Order already exists') {
         throw new ConflictException('Order already exists');
-      }
+      };
       if (e.errors) {
         const missingFields = Object.keys(e.errors);
         throw new BadRequestException(
           `Required fields are missing: ${missingFields.join(', ')}`,
         );
-      }
+      };
       if (e.response.message === 'Not enough stock') {
         throw new ConflictException('Not enough stock');
-      }
+      };
       if (e.response.message === 'Total price is incorrect') {
         throw new ConflictException('Order price is incorrect');
-      }
+      };
       throw new InternalServerErrorException();
     }
   }
-
+  
   async findAll() {
     try {
       const orders = await this.orderModel.find().exec();
@@ -66,12 +67,12 @@ export class OrdersService {
 
   async findOne(id: string) {
     try {
-      const order = await this.orderModel.findById(id).exec();
-      if (!order) {
+      const order = await this.orderExists("_id", id);
+      return order;
+    } catch (e) {
+      if (e.response.message === 'Order not found') {
         throw new NotFoundException('Order not found');
       }
-      return instanceToPlain(new Order(order.toJSON()));
-    } catch (e) {
       throw new InternalServerErrorException();
     }
   }
@@ -81,14 +82,13 @@ export class OrdersService {
       const [ customer_info, order_observation, ...rest ] = Object.keys(updateOrderDto);
       if (rest.length > 0) {
         throw new BadRequestException('Very long message');
-      }
-      const order = this.orderModel.find({ _id: id }).exec();
-      if (!order) {
-        throw new NotFoundException('Order not found');
-      }
+      };
+
+      await this.orderExists("_id", id);
       await this.orderModel.updateOne({ _id: id }, updateOrderDto).exec();
+
       const updated_order = await this.orderModel.findById(id).exec();
-      return updated_order;
+      return updated_order;     
     } catch (e) {
       if (e.response.message === 'Order not found') {
         throw new NotFoundException('Order not found');
@@ -102,57 +102,55 @@ export class OrdersService {
 
   async updateStatus(id: string, updateOrderStatusDto: UpdateOrderStatusDto) {
     try {
-      const order = await this.orderModel.findById(id).exec();
-      if (!order) {
-        throw new NotFoundException('Order not found');
-      }
-      if (
-        updateOrderStatusDto.status === 'canceled' &&
-        order.status !== 'canceled' &&
-        order.status !== 'refunded'
-      ) {
-        for (const stock of order.stock_sources) {
-          const stock_to_refund = await this.stockModel.findById(stock.stock_id).exec();
-          if (stock_to_refund) {
-            stock_to_refund.qty += stock.quantity;
-            await stock_to_refund.save();
-          } else {
-            throw new NotFoundException(`Stock with ID ${stock.stock_id} not found`);
-          }
-        }
-      }
+      const order = await this.orderExists("_id", id);
+      if (updateOrderStatusDto.status === 'canceled' && order.status !== 'canceled' && order.status !== 'refunded') {
+        await this.refundStock(order);
+      };
       if (order.status === 'canceled' || order.status === 'refunded') {
         throw new ConflictException('Order is already canceled or refunded');
-      }
+      };
+
       await this.orderModel.updateOne({ _id: id }, updateOrderStatusDto);
+
       const updated_order = await this.orderModel.findById(id).exec();
       return updated_order;
     } catch (e) {
       if (e.response.message === 'Order not found') {
         throw new NotFoundException('Order not found');
-      }
+      };
       if (e.response.message === 'Order is already canceled or refunded') {
         throw new ConflictException('Order is already canceled or refunded');
-      }
+      };
       if (e.errors) {
         const missingFields = Object.keys(e.errors);
         throw new BadRequestException(
           `Required fields are missing: ${missingFields.join(', ')}`,
         );
-      }
+      };
       throw new InternalServerErrorException();
     }
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     try {
-      return this.orderModel.deleteOne({ _id: id }).exec();
+      return await this.orderModel.deleteOne({ _id: id }).exec();
     } catch (e) {
       throw new InternalServerErrorException();
     }
   }
 
-  async verifyStock(items, order) {
+
+  // Helper methods for processing and managing order-related logic
+
+  async orderExists(key: string, value: string): Promise<Order> {
+    const order = await this.orderModel.find({ [key]: value }).exec();
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    return order[0];
+  }
+
+  async verifyStock(items: any, order: Order) {
     for (const item of items) {
       const stocks = await this.stockModel
         .find({
@@ -192,6 +190,18 @@ export class OrdersService {
     }
     if (total !== createOrderDto.order_total) {
       throw new ConflictException('Total price is incorrect');
+    }
+  }
+
+  async refundStock(order: Order) {
+    for (const stock of order.stock_sources) {
+      const stock_to_refund = await this.stockModel.findById(stock.stock_id).exec();
+      if (stock_to_refund) {
+        stock_to_refund.qty += stock.quantity;
+        await stock_to_refund.save();
+      } else {
+        throw new NotFoundException(`Stock with ID ${stock.stock_id} not found`);
+      }
     }
   }
 }

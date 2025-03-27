@@ -20,10 +20,16 @@ export class ProductsService {
     @InjectModel(Product.name) private productModel: Model<Product>,
   ) {}
 
+
+  // Methods for managing products
+
   async create(createProductDto: CreateProductDto) {
     try {
+      await this.productExists('sku', createProductDto.sku);
+
       const createProduct = new this.productModel(createProductDto);
       const product = await createProduct.save();
+
       return instanceToPlain(new Product(product.toJSON()));
     } catch (e) {
       if (e.code === 11000) {
@@ -41,12 +47,7 @@ export class ProductsService {
 
   async findAll() {
     try {
-      const products = await this.productModel
-        .find()
-        .populate('stocks')
-        .populate('prices')
-        .exec();
-
+      const products = await this.productModel.find().populate('stocks').populate('prices').exec();
       return products.map((product) => {
         const jsonProduct = product.toJSON();
         jsonProduct.prices = jsonProduct.prices.map(
@@ -64,26 +65,22 @@ export class ProductsService {
 
   async findOne(id: string) {
     try {
-      const product = await this.productModel
-        .findById(id)
-        .populate('stocks')
-        .populate('prices')
-        .exec();
+      const product = await this.productModel.findById(id).populate('stocks').populate('prices').exec();
       if (!product) {
         throw new NotFoundException('Product not found');
       }
       return instanceToPlain(new Product(product.toJSON()));
     } catch (e) {
+      if (e.response.message === 'Product not found') {
+        throw new ConflictException('Product not found');
+      };
       throw new InternalServerErrorException();
     }
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
-      const product = await this.productModel.findById(id).exec();
-      if (!product) {
-        throw new NotFoundException('Product not found');
-      }
+      await this.productExists('_id', id);
       await this.productModel.updateOne({ _id: id }, updateProductDto).exec();
       const updated_product = await this.productModel.findById(id).exec();
       return updated_product;
@@ -97,10 +94,7 @@ export class ProductsService {
 
   async remove(id: string) {
     try {
-      const product = await this.productModel.findById(id).exec();
-      if (!product) {
-        throw new NotFoundException('Product not found');
-      }
+      const product = this.productExists('_id', id);
       await this.productModel.deleteOne({ _id: id }).exec();
       return product;
     } catch (e) {
@@ -109,5 +103,16 @@ export class ProductsService {
       }
       throw new InternalServerErrorException();
     }
+  }
+
+  
+  // Helper methods for processing and managing product-related logic
+
+  async productExists(key: string, value: string) {
+    const product = await this.productModel.find({ [key]: value }).exec();
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+    return product[0];
   }
 }
