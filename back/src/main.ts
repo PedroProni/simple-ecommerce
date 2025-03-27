@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
-    .setTitle('Basic E-Commerce')
+    .setTitle('Simple E-Commerce')
     .setDescription('E-Commerce API docs')
     .setVersion('1.0')
     .addTag('ecommerce')
