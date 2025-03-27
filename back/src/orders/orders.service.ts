@@ -78,14 +78,24 @@ export class OrdersService {
 
   async update(id: string, updateOrderDto: UpdateOrderDto) {
     try {
-      const order = await this.orderModel
-        .updateOne({ _id: id }, updateOrderDto)
-        .exec();
+      const [ customer_info, order_observation, ...rest ] = Object.keys(updateOrderDto);
+      if (rest.length > 0) {
+        throw new BadRequestException('Very long message');
+      }
+      const order = this.orderModel.find({ _id: id }).exec();
       if (!order) {
         throw new NotFoundException('Order not found');
       }
-      return order;
+      await this.orderModel.updateOne({ _id: id }, updateOrderDto).exec();
+      const updated_order = await this.orderModel.findById(id).exec();
+      return updated_order;
     } catch (e) {
+      if (e.response.message === 'Order not found') {
+        throw new NotFoundException('Order not found');
+      }
+      if (e.response.message === 'Very long message') {
+        throw new BadRequestException('The only fields that can be updated are customer_info and order_observation');
+      }
       throw new InternalServerErrorException();
     }
   }
