@@ -38,7 +38,7 @@ export class Customer {
   number: number;
 
   @Expose()
-  @Prop({ required: true })
+  @Prop({ default: '' })
   complement: string;
 
   @Expose()

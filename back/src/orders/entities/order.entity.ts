@@ -52,7 +52,7 @@ export class Order {
   order_total: number;
 
   @Expose()
-  @Prop()
+  @Prop({ default: '' })
   order_observation: string;
 
   @Prop({ 

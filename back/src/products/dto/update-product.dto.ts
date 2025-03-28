@@ -20,12 +20,17 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @Expose()
   @ApiProperty()
   @IsString()
-  description: string;
+  description?: string;
 
   @Expose()
   @ApiProperty({ enum: Statuses, default: Statuses.active })
   @IsEnum(Statuses)
   status: Statuses;
+
+  @Expose()
+  @ApiProperty()
+  @IsString()
+  main_category: string;
 
   @Expose()
   @ApiProperty()

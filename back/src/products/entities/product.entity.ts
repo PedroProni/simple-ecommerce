@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import { Image } from 'src/products/entities/image.entity';
 import { Stock } from 'src/stocks/entities/stock.entity';
 import { Price } from 'src/prices/entities/price.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 export enum Statuses {
   active = 'active',
@@ -30,12 +31,17 @@ export class Product {
   name: string;
 
   @Expose()
-  @Prop({ required: true })
+  @Prop({ default: '' }) 
   description: string;
 
   @Expose()
   @Prop({ required: true })
   status: Statuses;
+
+  @Expose()
+  @Prop({ required: true })
+  @Type(() => Category)
+  main_category: string;
 
   @Expose()
   @Prop({ required: true })
@@ -46,7 +52,7 @@ export class Product {
   brand: string;
 
   @Expose()
-  @Prop({ required: true })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Image' }] })
   @Type(() => Image)
   images: Image[];
 

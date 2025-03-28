@@ -13,11 +13,13 @@ import { instanceToPlain } from 'class-transformer';
 import { Product } from './entities/product.entity';
 import { Price } from 'src/prices/entities/price.entity';
 import { Stock } from 'src/stocks/entities/stock.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
+    @InjectModel(Category.name) private categoryModel: Model<Category>,
   ) {}
 
 
@@ -25,15 +27,20 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto) {
     try {
-      await this.productExists('sku', createProductDto.sku);
-
+      const product_already_exists = await this.productModel.findOne({ sku: createProductDto.sku }).exec();
+      if (product_already_exists) {
+        throw new ConflictException('Product already exists');
+      }
+      await this.categoryExists(createProductDto.main_category);
       const createProduct = new this.productModel(createProductDto);
       const product = await createProduct.save();
-
       return instanceToPlain(new Product(product.toJSON()));
     } catch (e) {
-      if (e.code === 11000) {
+      if (e.response.message === 'Product already exists') {
         throw new ConflictException('Product already exists');
+      }
+      if (e.response.message === 'Category not found') {
+        throw new ConflictException('Category not found');
       }
       if (e.errors) {
         const missingFields = Object.keys(e.errors);
@@ -109,10 +116,18 @@ export class ProductsService {
   // Helper methods for processing and managing product-related logic
 
   async productExists(key: string, value: string) {
-    const product = await this.productModel.find({ [key]: value }).exec();
+    const product = await this.productModel.findOne({ [key]: value }).exec();
       if (!product) {
         throw new NotFoundException('Product not found');
       }
-    return product[0];
+      return product;
+  }
+
+  async categoryExists(code: string) {
+    const category = await this.categoryModel.findOne({ category_code: code }).exec();
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    };
+    return category;
   }
 }
