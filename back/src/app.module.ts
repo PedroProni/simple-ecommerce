@@ -7,6 +7,7 @@ import { PricesModule } from './prices/prices.module';
 import { StocksModule } from './stocks/stocks.module';
 import { OrdersModule } from './orders/orders.module';
 import { CategoriesModule } from './categories/categories.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { CategoriesModule } from './categories/categories.module';
     PricesModule, 
     StocksModule, 
     OrdersModule, 
-    CategoriesModule,
+    CategoriesModule, PaymentsModule,
   ],
   controllers: [],
   providers: [],

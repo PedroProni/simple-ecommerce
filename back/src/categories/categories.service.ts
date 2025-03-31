@@ -56,8 +56,7 @@ export class CategoriesService {
 
   async findOne(id: string) {
     try {
-      const category = await this.categoryExists('_id', id);
-      return category;
+      return await this.categoryExists('_id', id); 
     } catch (e) {
       if (e.status === 404) {
         throw new NotFoundException('Category not found');
