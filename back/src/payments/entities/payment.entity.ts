@@ -31,7 +31,7 @@ export class Payment {
     description: string;
 
     @Expose()
-    @Prop({ required: true, default: Statuses.active })
+    @Prop({ default: Statuses.active })
     @IsOptional()
     @IsEnum(Statuses)
     status: Statuses;

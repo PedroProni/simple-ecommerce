@@ -3,6 +3,7 @@ import { Expose, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 import { Customer } from './customer.entity';
 import { Items } from './items.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 export enum Statuses {
   pending = 'pending',
@@ -42,6 +43,14 @@ export class Order {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Items' }], required: true })
   @Type(() => Items)
   items: Items[];
+
+  @Expose()
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Payment' })
+  payment_info: Payment;
+
+  @Expose()
+  @Prop({ default: 1 })
+  installments: number;
 
   @Expose()
   @Prop({ required: true })

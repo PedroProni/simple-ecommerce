@@ -4,6 +4,7 @@ import { IsEnum, IsString, ValidateNested } from 'class-validator';
 import { CustomerDto } from './customer.dto';
 import { ItemsDto } from './items.dto';
 import { Statuses } from '../entities/order.entity';
+import { CreatePaymentDto } from 'src/payments/dto/create-payment.dto';
 
 export class CreateOrderDto {
   @Expose()
@@ -27,6 +28,16 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => ItemsDto)
   items: ItemsDto[];
+
+  @Expose()
+  @ApiProperty({ type: CreatePaymentDto })
+  @ValidateNested()
+  @Type(() => CreatePaymentDto)
+  payment_info: CreatePaymentDto;
+
+  @Expose()
+  @ApiProperty()
+  installments: number;
 
   @Expose()
   @ApiProperty()

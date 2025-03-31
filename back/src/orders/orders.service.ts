@@ -7,18 +7,22 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { instanceToPlain } from 'class-transformer';
 import { Order } from './entities/order.entity';
 import { Model } from 'mongoose';
 import { Stock } from 'src/stocks/entities/stock.entity';
-import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { Payment } from 'src/payments/entities/payment.entity';
+import { Product } from 'src/products/entities/product.entity';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
     @InjectModel(Stock.name) private stockModel: Model<Stock>,
+    @InjectModel(Payment.name) private paymentModel: Model<Payment>,
+    @InjectModel(Product.name) private productModel: Model<Product>,
   ) {}
 
 
@@ -30,6 +34,15 @@ export class OrdersService {
       const orderItems = createOrderDto.items;
 
       await this.orderExists('increment_id', createOrderDto.increment_id);
+      await this.verifyPayment(createOrderDto.payment_info.payment_code);
+      if(createOrder.installments) {
+        if(createOrder.installments < 1) {
+          throw new BadRequestException('Installments must be at least 1');
+        }
+      }
+      for (const item of orderItems) {
+        await this.verifyProduct(item.sku);
+      }
       await this.verifyStock(orderItems, createOrder); 
       this.verifyPrice(createOrderDto);
 
@@ -45,6 +58,15 @@ export class OrdersService {
         throw new BadRequestException(
           `Required fields are missing: ${missingFields.join(', ')}`,
         );
+      };
+      if(e.response.message === 'Installments must be at least 1') {
+        throw new BadRequestException('Installments must be at least 1');
+      }
+      if (e.response.message === 'Product not found') {
+        throw new NotFoundException('Product not found');
+      };
+      if (e.response.message === 'Payment not found') {
+        throw new NotFoundException('Payment not found');
       };
       if (e.response.message === 'Not enough stock') {
         throw new ConflictException('Not enough stock');
@@ -143,11 +165,11 @@ export class OrdersService {
   // Helper methods for processing and managing order-related logic
 
   async orderExists(key: string, value: string): Promise<Order> {
-    const order = await this.orderModel.find({ [key]: value }).exec();
+    const order = await this.orderModel.findOne({ [key]: value }).exec();
     if (!order) {
       throw new NotFoundException('Order not found');
     }
-    return order[0];
+    return order;
   }
 
   async verifyStock(items: any, order: Order) {
@@ -203,5 +225,21 @@ export class OrdersService {
         throw new NotFoundException(`Stock with ID ${stock.stock_id} not found`);
       }
     }
+  }
+
+  async verifyPayment(code: string) {
+    const payment = await this.paymentModel.findOne({ payment_code: code }).exec();
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
+    }
+    return payment;
+  }
+
+  async verifyProduct(sku: string) {
+    const product = await this.productModel.findOne({ sku: sku }).exec();
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return product;
   }
 }
