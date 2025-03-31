@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Expose } from "class-transformer";
 import { IsEnum, IsOptional, IsString } from "class-validator";
+import { Types } from "mongoose";
 
 export enum Statuses {
     active = 'active',
@@ -10,7 +11,7 @@ export enum Statuses {
 @Schema({ timestamps: { createdAt:'created_at', updatedAt:'updated_at' } })
 export class Payment {
     @Expose({ name: 'payment_id' })
-    @Prop({ default: '' })
+    @Prop({ default: () => new Types.ObjectId(), unique: true })
     _id: string;
 
     @Expose()
