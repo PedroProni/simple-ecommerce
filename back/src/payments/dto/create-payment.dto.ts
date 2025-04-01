@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
-import { IsEnum, IsString } from "class-validator";
+import { IsEnum, IsOptional, IsString } from "class-validator";
 import { Statuses } from "../entities/payment.entity";
 
 export class CreatePaymentDto {
@@ -16,11 +16,13 @@ export class CreatePaymentDto {
 
     @Expose()
     @ApiProperty()
+    @IsOptional()
     @IsString()
     description: string;
 
     @Expose()
     @ApiProperty()
+    @IsOptional()
     @IsEnum(Statuses)
     status: Statuses;
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { IsEnum, IsString, ValidateNested } from 'class-validator';
+import { IsEnum, IsNumber, IsString, ValidateNested } from 'class-validator';
 import { CustomerDto } from './customer.dto';
 import { ItemsDto } from './items.dto';
 import { Statuses } from '../entities/order.entity';
@@ -37,17 +37,21 @@ export class CreateOrderDto {
 
   @Expose()
   @ApiProperty()
+  @IsNumber()
   installments: number;
 
   @Expose()
   @ApiProperty()
+  @IsNumber()
   order_discount: number;
 
   @Expose()
   @ApiProperty()
+  @IsNumber()
   order_total: number;
 
   @Expose()
   @ApiProperty()
+  @IsString()
   order_observation: string;
 }

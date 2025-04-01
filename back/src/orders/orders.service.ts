@@ -32,7 +32,12 @@ export class OrdersService {
       const createOrder = new this.orderModel(createOrderDto);
       const orderItems = createOrderDto.items;
 
-      await this.orderExists('increment_id', createOrderDto.increment_id);
+      const order_already_exists = await this.orderModel
+        .findOne({ increment_id: createOrder.increment_id })
+        .exec();
+      if (order_already_exists) {
+        throw new ConflictException('Order already exists');
+      }
       await this.verifyPayment(createOrderDto.payment_info.payment_code);
       if (createOrder.installments) {
         if (createOrder.installments < 1) {
@@ -141,7 +146,7 @@ export class OrdersService {
         .sort({ priority: 1 })
         .exec();
       if (stocks.length === 0) {
-        throw new ConflictException('Not enough stock');
+        throw new ConflictException('Not enough stock', item.sku);
       }
       for (const stock of stocks) {
         let found_stock = false;
@@ -156,7 +161,7 @@ export class OrdersService {
           break;
         }
         if (!found_stock) {
-          throw new ConflictException('Not enough stock');
+          throw new ConflictException('Not enough stock', item.sku);
         }
       }
     }
@@ -196,13 +201,16 @@ export class OrdersService {
     if (!payment) {
       throw new NotFoundException('Payment not found');
     }
+    if (payment.status !== 'active') {
+      throw new ConflictException('Payment is not active');
+    }
     return payment;
   }
 
   async verifyProduct(sku: string) {
     const product = await this.productModel.findOne({ sku: sku }).exec();
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Product not found', sku);
     }
     return product;
   }
@@ -217,13 +225,13 @@ export class OrdersService {
       throw new BadRequestException('Installments must be at least 1');
     }
     if (e.response.message === 'Product not found') {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException(`Product: ${e.response.error} not found`);
     }
     if (e.response?.message === 'Order not found') {
       throw new NotFoundException('Order not found');
     }
     if (e.response?.message === 'Not enough stock') {
-      throw new ConflictException('Not enough stock');
+      throw new ConflictException(`Product: ${e.response.error} doesn't have enough stock`);
     }
     if (e.response?.message === 'Total price is incorrect') {
       throw new ConflictException('Order price is incorrect');
@@ -231,7 +239,13 @@ export class OrdersService {
     if (e.response?.message === 'Order is already canceled or refunded') {
       throw new ConflictException('Order is already canceled or refunded');
     }
-    if (e.response.message === 'Very long message') {
+    if (e.response?.message === 'Payment not found') {
+      throw new NotFoundException('Payment not found');
+    }
+    if (e.response?.message === 'Payment is not active') {
+      throw new ConflictException('Payment is not active');
+    }
+    if (e.response?.message === 'Very long message') {
       throw new BadRequestException(
         'The only fields that can be updated are customer_info and order_observation',
       );
