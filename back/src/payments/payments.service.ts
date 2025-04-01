@@ -35,8 +35,14 @@ export class PaymentsService {
     }
   }
 
-  async findAll() {
+  async findAll(payment_code, updated_at) {
     try {
+      if (payment_code) {
+        return await this.findByPaymentCode(payment_code);
+      }
+      if (updated_at) {
+        return await this.findByUpdatedAt(updated_at);
+      }
       const payments = await this.paymentModel.find().exec();
       return payments.map((payment) =>
         instanceToPlain(new Payment(payment.toJSON())),
@@ -83,6 +89,20 @@ export class PaymentsService {
       throw new NotFoundException('Payment not found');
     }
     return payment;
+  }
+
+  async findByPaymentCode(payment_code: string) {
+    const payments = await this.paymentModel.find({ payment_code: payment_code });
+    return payments.map((payment) =>
+      instanceToPlain(new Payment(payment.toJSON())),
+    );
+  }
+
+  async findByUpdatedAt(updated_at: Date) {
+    const payments = await this.paymentModel.find({ updated_at: { $gt: updated_at } });
+    return payments.map((payment) =>
+      instanceToPlain(new Payment(payment.toJSON())),
+    );
   }
 
   // Method for handling exceptions
