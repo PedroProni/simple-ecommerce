@@ -58,8 +58,14 @@ export class OrdersService {
     }
   }
 
-  async findAll() {
+  async findAll(increment_id, updated_at) {
     try {
+      if (increment_id) {
+        return await this.findByIncrementId(increment_id);
+      }
+      if (updated_at) {
+        return await this.findByUpdatedAt(updated_at);
+      }
       const orders = await this.orderModel.find().exec();
       return orders.map((order) => instanceToPlain(new Order(order.toJSON())));
     } catch (e) {
@@ -213,6 +219,26 @@ export class OrdersService {
       throw new NotFoundException('Product not found', sku);
     }
     return product;
+  }
+
+  async findByIncrementId(increment_id: string) {
+    const order = await this.orderModel
+      .findOne({ increment_id: increment_id })
+      .exec();
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    return order;
+  }
+
+  async findByUpdatedAt(updated_at: Date) {
+    const orders = await this.orderModel
+      .find({ updated_at: { $gt: updated_at } })
+      .exec();
+    if (orders.length === 0) {
+      throw new NotFoundException('Order not found');
+    }
+    return orders;
   }
 
   // Method for handling exceptions
