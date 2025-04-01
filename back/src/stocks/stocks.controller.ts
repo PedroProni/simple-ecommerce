@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Put, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, Query } from '@nestjs/common';
 import { StocksService } from './stocks.service';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
@@ -13,8 +13,8 @@ export class StocksController {
   }
 
   @Get()
-  findAll() {
-    return this.stocksService.findAll();
+  findAll(@Query('sku') sku?: string, @Query('updated_at') updated_at?: Date) {
+    return this.stocksService.findAll(sku, updated_at);
   }
 
   @Get(':id')

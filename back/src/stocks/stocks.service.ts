@@ -29,8 +29,14 @@ export class StocksService {
     }
   }
 
-  async findAll() {
+  async findAll(sku, updated_at) {
     try {
+      if (sku) {
+        return await this.findBySKU(sku);
+      }
+      if (updated_at) {
+        return await this.findByUpdatedAt(updated_at);
+      }
       const stocks = await this.stockModel.find().exec();
       return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
     } catch (e) {
@@ -95,6 +101,26 @@ export class StocksService {
     });
   }
 
+  async findBySKU(sku: string) {
+    try {
+      const stocks = await this.stockModel.find({ sku }).exec();
+      return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
+    } catch (e) {
+      await this.handleException(e);
+    }
+  }
+
+  async findByUpdatedAt(updated_at: Date) {
+    try {
+      const stocks = await this.stockModel
+        .find({ updated_at: { $gt: updated_at } })
+        .exec();
+      return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
+    } catch (e) {
+      await this.handleException(e);
+    }
+  }
+
   // Method for handling exceptions
 
   async handleException(e: any) {
@@ -116,7 +142,6 @@ export class StocksService {
         `Required fields are missing: ${missingFields.join(', ')}`,
       );
     }
-
     throw new InternalServerErrorException();
   }
 }
