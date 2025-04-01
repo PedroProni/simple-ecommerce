@@ -41,18 +41,20 @@ export class ProductsService {
     }
   }
 
-  async findAll(sku?: string, updated_at?: Date) {
+  async findAll(sku, updated_at, limit = 10, page = 1) {
     try {
       if (sku) {
-        return await this.findBySKU(sku);
+        return await this.findBySKU(sku, limit, page);
       };
       if (updated_at) {
-        return await this.findByUpdatedAt(updated_at);
+        return await this.findByUpdatedAt(updated_at, limit, page);
       };
       const products = await this.productModel
         .find()
         .populate('stocks')
         .populate('prices')
+        .skip((page - 1) * limit)
+        .limit(limit)
         .exec();
       return products.map((product) => {
         const jsonProduct = product.toJSON();
@@ -126,12 +128,14 @@ export class ProductsService {
     return category;
   }
 
-  async findBySKU(sku: string) {
+  async findBySKU(sku: string, limit: number, page: number) {
     try {
       const product = await this.productModel
         .findOne({ sku: sku })
         .populate('stocks')
         .populate('prices')
+        .skip((page - 1) * limit)
+        .limit(limit)
         .exec();
       if (!product) {
         throw new NotFoundException('Product not found');
@@ -142,12 +146,14 @@ export class ProductsService {
     }
   }
 
-  async findByUpdatedAt(updated_at: Date) {
+  async findByUpdatedAt(updated_at: Date, limit: number, page: number) {
     try {
       const products = await this.productModel
         .find({ updated_at: { $gt: updated_at } })
         .populate('stocks')
         .populate('prices')
+        .skip((page - 1) * limit)
+        .limit(limit)
         .exec();
       return products.map((product) => {
         const jsonProduct = product.toJSON();
