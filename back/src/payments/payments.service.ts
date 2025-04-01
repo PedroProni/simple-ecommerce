@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Payment } from './entities/payment.entity';
@@ -12,23 +17,21 @@ export class PaymentsService {
     @InjectModel(Payment.name) private paymentModel: Model<Payment>,
   ) {}
 
-
   // Methods for managing payments
 
   async create(createPaymentDto: CreatePaymentDto) {
     try {
       const createPayment = new this.paymentModel(createPaymentDto);
-      const payment_already_exists = await this.paymentModel.find({ payment_code: createPayment.payment_code });
+      const payment_already_exists = await this.paymentModel.find({
+        payment_code: createPayment.payment_code,
+      });
       if (payment_already_exists.length > 0) {
         throw new ConflictException('Payment already exists');
       }
       const payment = await createPayment.save();
       return instanceToPlain(new Payment(payment.toJSON()));
     } catch (e) {
-      if (e.response.message === 'Payment already exists') {
-        throw new ConflictException('Payment already exists');
-      };
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
 
@@ -39,7 +42,7 @@ export class PaymentsService {
         instanceToPlain(new Payment(payment.toJSON())),
       );
     } catch (e) {
-      throw new InternalServerErrorException(e);
+      await this.handleException(e);
     }
   }
 
@@ -47,10 +50,7 @@ export class PaymentsService {
     try {
       return await this.paymentExists('_id', id);
     } catch (e) {
-      if (e.response.message === 'Payment not found') {
-        throw new NotFoundException('Payment not found');
-      }
-      throw new InternalServerErrorException(e);
+      await this.handleException(e);
     }
   }
 
@@ -60,11 +60,8 @@ export class PaymentsService {
       await this.paymentModel.updateOne({ _id: id }, updatePaymentDto);
       const updated_payment = await this.paymentModel.findById(id);
       return updated_payment;
-    } catch(e) {
-      if (e.response.message === 'Payment not found') {
-        throw new NotFoundException('Payment not found');
-      };
-      throw new InternalServerErrorException(e);
+    } catch (e) {
+      await this.handleException(e);
     }
   }
 
@@ -74,20 +71,29 @@ export class PaymentsService {
       await this.paymentModel.deleteOne({ _id: payment._id });
       return payment;
     } catch (e) {
-      if (e.response.message === 'Payment not found') {
-        throw new NotFoundException('Payment not found');
-      }
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
 
-
   // Helper methods for processing and managing payment-related logic
+
   async paymentExists(key: string, value: string) {
     const payment = await this.paymentModel.findOne({ [key]: value });
     if (!payment) {
       throw new NotFoundException('Payment not found');
     }
     return payment;
+  }
+
+  // Method for handling exceptions
+
+  async handleException(e) {
+    if (e.response.message === 'Payment not found') {
+      throw new NotFoundException('Payment not found');
+    }
+    if (e.response.message === 'Payment already exists') {
+      throw new ConflictException('Payment already exists');
+    }
+    throw new InternalServerErrorException();
   }
 }

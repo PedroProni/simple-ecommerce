@@ -16,7 +16,6 @@ import { Stock } from './entities/stock.entity';
 export class StocksService {
   constructor(@InjectModel(Stock.name) private stockModel: Model<Stock>) {}
 
-
   // Methods for managing stocks
 
   async create(createStockDto: CreateStockDto) {
@@ -26,22 +25,7 @@ export class StocksService {
       const stock = await createStock.save();
       return instanceToPlain(new Stock(stock.toJSON()));
     } catch (e) {
-      if (e.code === 11000 || e.response?.message === 'Stock already exists') {
-        throw new ConflictException('Stock already exists');
-      }
-      if (e.response?.message === 'Stock quantity must be greater than 0') {
-        throw new ConflictException('Stock quantity must be greater than 0');
-      }
-      if (e.response?.message === 'Stock priority already exists') {
-        throw new ConflictException('Stock priority already exists');
-      }
-      if (e.errors) {
-        const missingFields = Object.keys(e.errors);
-        throw new BadRequestException(
-          `Required fields are missing: ${missingFields.join(', ')}`,
-        );
-      }
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
 
@@ -50,7 +34,7 @@ export class StocksService {
       const stocks = await this.stockModel.find().exec();
       return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
     } catch (e) {
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
 
@@ -59,10 +43,7 @@ export class StocksService {
       const stock = await this.stockExists('_id', id);
       return instanceToPlain(new Stock(stock.toJSON()));
     } catch (e) {
-      if (e.response?.message === 'Stock not found') {
-        throw new NotFoundException('Stock not found');
-      }
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
 
@@ -73,16 +54,7 @@ export class StocksService {
       const updated_stock = await this.stockModel.findById(id).exec();
       return updated_stock;
     } catch (e) {
-      if (e.status === 404) {
-        throw new NotFoundException('Stock not found');
-      }
-      if (e.response?.message === 'Stock quantity must be greater than 0') {
-        throw new ConflictException('Stock quantity must be greater than 0');
-      }
-      if (e.response?.message === 'Stock priority already exists') {
-        throw new ConflictException('Stock priority already exists');
-      }
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
 
@@ -91,10 +63,9 @@ export class StocksService {
       await this.stockExists('_id', id);
       return await this.stockModel.deleteOne({ _id: id }).exec();
     } catch (e) {
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
-
 
   // Helper methods for processing and managing stock-related logic
 
@@ -124,4 +95,28 @@ export class StocksService {
     });
   }
 
+  // Method for handling exceptions
+
+  async handleException(e: any) {
+    if (e.code === 11000 || e.response?.message === 'Stock already exists') {
+      throw new ConflictException('Stock already exists');
+    }
+    if (e.response?.message === 'Stock not found') {
+      throw new NotFoundException('Stock not found');
+    }
+    if (e.response?.message === 'Stock quantity must be greater than 0') {
+      throw new ConflictException('Stock quantity must be greater than 0');
+    }
+    if (e.response?.message === 'Stock priority already exists') {
+      throw new ConflictException('Stock priority already exists');
+    }
+    if (e.errors) {
+      const missingFields = Object.keys(e.errors);
+      throw new BadRequestException(
+        `Required fields are missing: ${missingFields.join(', ')}`,
+      );
+    }
+
+    throw new InternalServerErrorException();
+  }
 }

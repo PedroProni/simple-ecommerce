@@ -17,29 +17,27 @@ export class CategoriesService {
     @InjectModel(Category.name) private categoryModel: Model<Category>,
   ) {}
 
-
   // Methods for managing categories
 
   async create(createCategoryDto: CreateCategoryDto) {
     try {
       const createCategory = new this.categoryModel(createCategoryDto);
       if (createCategory.parent_category_code) {
-          await this.categoryExists('category_code', createCategory.parent_category_code);
+        await this.categoryExists(
+          'category_code',
+          createCategory.parent_category_code,
+        );
       }
-      const category_already_exists = await this.categoryModel.find({ category_code: createCategory.category_code });
+      const category_already_exists = await this.categoryModel.find({
+        category_code: createCategory.category_code,
+      });
       if (category_already_exists.length > 0) {
         throw new ConflictException('Category already exists');
       }
       const category = await createCategory.save();
       return instanceToPlain(new Category(category.toJSON()));
     } catch (e) {
-      if (e.response.message === 'Category already exists') {
-        throw new ConflictException('Category already exists');
-      };
-      if (e.response.message === 'Category not found') {
-        throw new ConflictException('Father category not found');
-      };
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
 
@@ -50,18 +48,15 @@ export class CategoriesService {
         instanceToPlain(new Category(category.toJSON())),
       );
     } catch (e) {
-      throw new InternalServerErrorException(e);
+      await this.handleException(e);
     }
   }
 
   async findOne(id: string) {
     try {
-      return await this.categoryExists('_id', id); 
+      return await this.categoryExists('_id', id);
     } catch (e) {
-      if (e.status === 404) {
-        throw new NotFoundException('Category not found');
-      }
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
 
@@ -72,10 +67,7 @@ export class CategoriesService {
       const updated_category = await this.categoryModel.findById(id).exec();
       return updated_category;
     } catch (e) {
-      if (e.status === 404) {
-        throw new NotFoundException('Category not found');
-      }
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
 
@@ -85,13 +77,9 @@ export class CategoriesService {
       await this.categoryModel.deleteOne({ _id: id }).exec();
       return category;
     } catch (e) {
-      if (e.status === 404) {
-        throw new NotFoundException('Category not found');
-      }
-      throw new InternalServerErrorException();
+      await this.handleException(e);
     }
   }
-
 
   // Helper methods for processing and managing category-related logic
 
@@ -101,5 +89,20 @@ export class CategoriesService {
       throw new NotFoundException('Category not found');
     }
     return category;
+  }
+
+  // Method for handling exceptions
+
+  async handleException(e) {
+    if (e.response?.message === 'Category already exists') {
+      throw new ConflictException('Category already exists');
+    }
+    if (e.response?.message === 'Category not found') {
+      throw new ConflictException('Father category not found');
+    }
+    if (e.response?.message === 'Category not found') {
+      throw new NotFoundException('Category not found');
+    }
+    throw new InternalServerErrorException();
   }
 }
