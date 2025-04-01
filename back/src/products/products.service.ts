@@ -41,8 +41,14 @@ export class ProductsService {
     }
   }
 
-  async findAll() {
+  async findAll(sku?: string, updated_at?: Date) {
     try {
+      if (sku) {
+        return await this.findBySKU(sku);
+      };
+      if (updated_at) {
+        return await this.findByUpdatedAt(updated_at);
+      };
       const products = await this.productModel
         .find()
         .populate('stocks')
@@ -118,6 +124,44 @@ export class ProductsService {
       throw new NotFoundException('Category not found');
     }
     return category;
+  }
+
+  async findBySKU(sku: string) {
+    try {
+      const product = await this.productModel
+        .findOne({ sku: sku })
+        .populate('stocks')
+        .populate('prices')
+        .exec();
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+      return instanceToPlain(new Product(product.toJSON()));
+    } catch (e) {
+      await this.handleException(e);
+    }
+  }
+
+  async findByUpdatedAt(updated_at: Date) {
+    try {
+      const products = await this.productModel
+        .find({ updated_at: { $gt: updated_at } })
+        .populate('stocks')
+        .populate('prices')
+        .exec();
+      return products.map((product) => {
+        const jsonProduct = product.toJSON();
+        jsonProduct.prices = jsonProduct.prices.map(
+          (price) => new Price(price),
+        );
+        jsonProduct.stocks = jsonProduct.stocks.map(
+          (stock) => new Stock(stock),
+        );
+        return instanceToPlain(new Product(jsonProduct));
+      });
+    } catch (e) {
+      await this.handleException(e);
+    }
   }
 
   // Method for handling exceptions
