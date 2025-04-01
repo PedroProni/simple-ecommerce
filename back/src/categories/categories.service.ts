@@ -41,8 +41,14 @@ export class CategoriesService {
     }
   }
 
-  async findAll() {
+  async findAll(category_code, updated_at) {
     try {
+      if(category_code) {
+        await this.findByCategoryCode(category_code);
+      }
+      if(updated_at) {
+        await this.findByUpdatedAt(updated_at);
+      }
       const categories = await this.categoryModel.find().exec();
       return categories.map((category) =>
         instanceToPlain(new Category(category.toJSON())),
@@ -89,6 +95,23 @@ export class CategoriesService {
       throw new NotFoundException('Category not found');
     }
     return category;
+  }
+
+  async findByCategoryCode(category_code: string) {
+    const category = await this.categoryModel.find({
+      category_code: category_code,
+    });
+    if (category.length === 0) {
+      throw new NotFoundException('Category not found');
+    }
+    return category;
+  }
+
+  async findByUpdatedAt(updated_at: Date) {
+    const categories = await this.categoryModel.find({ updated_at: { $gt: updated_at } });
+    return categories.map((category) =>
+      instanceToPlain(new Category(category.toJSON())),
+    );
   }
 
   // Method for handling exceptions
