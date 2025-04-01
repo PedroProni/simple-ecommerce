@@ -42,8 +42,14 @@ export class PricesService {
     }
   }
 
-  async findAll() {
+  async findAll(sku, updated_at) {
     try {
+      if (sku) {
+        return await this.findBySKU(sku);
+      }
+      if (updated_at) {
+        return await this.findByUpdatedAt(updated_at);
+      }
       const prices = await this.priceModel.find().exec();
       return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
     } catch (e) {
@@ -92,6 +98,16 @@ export class PricesService {
       throw new NotFoundException('Price not found');
     }
     return price;
+  }
+
+  async findBySKU(sku: string) {
+    const prices = await this.priceModel.find({ sku: sku }).exec();
+    return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
+  }
+
+  async findByUpdatedAt(updated_at: Date) {
+    const prices = await this.priceModel.find({ updated_at: { $gt: updated_at } }).exec();
+    return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
   }
 
   // Method for handling exceptions

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Put, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, Query } from '@nestjs/common';
 import { PricesService } from './prices.service';
 import { CreatePriceDto } from './dto/create-price.dto';
 import { UpdatePriceDto } from './dto/update-price.dto';
@@ -13,8 +13,8 @@ export class PricesController {
   }
 
   @Get()
-  findAll() {
-    return this.pricesService.findAll();
+  findAll(@Query('sku') sku?: string, @Query('updated_at') updated_at?: Date) {
+    return this.pricesService.findAll(sku, updated_at);
   }
 
   @Get(':id')
