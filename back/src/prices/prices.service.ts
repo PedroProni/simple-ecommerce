@@ -42,15 +42,19 @@ export class PricesService {
     }
   }
 
-  async findAll(sku, updated_at) {
+  async findAll(sku, updated_at, limit = 10, page = 1) {
     try {
       if (sku) {
-        return await this.findBySKU(sku);
+        return await this.findBySKU(sku, limit, page);
       }
       if (updated_at) {
-        return await this.findByUpdatedAt(updated_at);
+        return await this.findByUpdatedAt(updated_at, limit, page);
       }
-      const prices = await this.priceModel.find().exec();
+      const prices = await this.priceModel
+        .find()
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
       return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
     } catch (e) {
       await this.handleException(e);
@@ -100,13 +104,21 @@ export class PricesService {
     return price;
   }
 
-  async findBySKU(sku: string) {
-    const prices = await this.priceModel.find({ sku: sku }).exec();
+  async findBySKU(sku: string, limit = 10, page = 1) {
+    const prices = await this.priceModel
+      .find({ sku: sku })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
     return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
   }
 
-  async findByUpdatedAt(updated_at: Date) {
-    const prices = await this.priceModel.find({ updated_at: { $gt: updated_at } }).exec();
+  async findByUpdatedAt(updated_at: Date, limit = 10, page = 1) {
+    const prices = await this.priceModel
+      .find({ updated_at: { $gt: updated_at } })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
     return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
   }
 

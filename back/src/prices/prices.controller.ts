@@ -13,8 +13,8 @@ export class PricesController {
   }
 
   @Get()
-  findAll(@Query('sku') sku?: string, @Query('updated_at') updated_at?: Date) {
-    return this.pricesService.findAll(sku, updated_at);
+  findAll(@Query('sku') sku?: string, @Query('updated_at') updated_at?: Date, @Query('limit') limit?:number, @Query('page') page?:number) {
+    return this.pricesService.findAll(sku, updated_at, limit, page);
   }
 
   @Get(':id')
