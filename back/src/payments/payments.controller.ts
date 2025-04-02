@@ -13,8 +13,8 @@ export class PaymentsController {
   }
 
   @Get()
-  findAll(@Query('payment_code') payment_code?: string, @Query('updated_at') updated_at?: Date) {
-    return this.paymentsService.findAll(payment_code, updated_at);
+  findAll(@Query('payment_code') payment_code?: string, @Query('updated_at') updated_at?: Date, @Query('limit') limit?:number, @Query('page') page?:number) {
+    return this.paymentsService.findAll(payment_code, updated_at, limit, page);
   }
 
   @Get(':id')

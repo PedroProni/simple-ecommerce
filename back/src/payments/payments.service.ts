@@ -35,15 +35,19 @@ export class PaymentsService {
     }
   }
 
-  async findAll(payment_code, updated_at) {
+  async findAll(payment_code, updated_at, limit = 10, page = 1) {
     try {
       if (payment_code) {
-        return await this.findByPaymentCode(payment_code);
+        return await this.findByPaymentCode(payment_code, limit, page);
       }
       if (updated_at) {
-        return await this.findByUpdatedAt(updated_at);
+        return await this.findByUpdatedAt(updated_at, limit, page);
       }
-      const payments = await this.paymentModel.find().exec();
+      const payments = await this.paymentModel
+        .find()
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
       return payments.map((payment) =>
         instanceToPlain(new Payment(payment.toJSON())),
       );
@@ -91,15 +95,29 @@ export class PaymentsService {
     return payment;
   }
 
-  async findByPaymentCode(payment_code: string) {
-    const payments = await this.paymentModel.find({ payment_code: payment_code });
+  async findByPaymentCode(payment_code: string, limit = 10, page = 1) {
+    const payments = await this.paymentModel
+      .find({ payment_code: payment_code })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+    if (payments.length === 0) {
+      throw new NotFoundException('Payment not found');
+    }
     return payments.map((payment) =>
       instanceToPlain(new Payment(payment.toJSON())),
     );
   }
 
-  async findByUpdatedAt(updated_at: Date) {
-    const payments = await this.paymentModel.find({ updated_at: { $gt: updated_at } });
+  async findByUpdatedAt(updated_at: Date, limit = 10, page = 1) {
+    const payments = await this.paymentModel
+      .find({ updated_at: { $gt: updated_at } })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+    if (payments.length === 0) {
+      throw new NotFoundException('Payment not found');
+    }
     return payments.map((payment) =>
       instanceToPlain(new Payment(payment.toJSON())),
     );
