@@ -55,6 +55,7 @@ export class ProductsService {
         .populate('prices')
         .skip((page - 1) * limit)
         .limit(limit)
+        .sort({ updated_at: -1 })
         .exec();
       return products.map((product) => {
         const jsonProduct = product.toJSON();
@@ -136,6 +137,7 @@ export class ProductsService {
         .populate('prices')
         .skip((page - 1) * limit)
         .limit(limit)
+        .sort({ updated_at: -1 })
         .exec();
       if (!product) {
         throw new NotFoundException('Product not found');
@@ -154,6 +156,7 @@ export class ProductsService {
         .populate('prices')
         .skip((page - 1) * limit)
         .limit(limit)
+        .sort({ updated_at: -1 })
         .exec();
       return products.map((product) => {
         const jsonProduct = product.toJSON();

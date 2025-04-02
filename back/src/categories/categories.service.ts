@@ -53,6 +53,7 @@ export class CategoriesService {
         .find()
         .skip((page - 1) * limit)
         .limit(limit)
+        .sort({ updated_at: -1 })
         .exec();
       return categories.map((category) =>
         instanceToPlain(new Category(category.toJSON())),
@@ -108,6 +109,7 @@ export class CategoriesService {
       })
       .skip((page - 1) * limit)
       .limit(limit)
+      .sort({ updated_at: -1 })
       .exec();
     if (category.length === 0) {
       throw new NotFoundException('Category not found');
@@ -120,6 +122,7 @@ export class CategoriesService {
       .find({ updated_at: { $gt: updated_at } })
       .skip((page - 1) * limit)
       .limit(limit)
+      .sort({ updated_at: -1 })
       .exec();
     if (categories.length === 0) {
       throw new NotFoundException('Category not found');
@@ -135,7 +138,7 @@ export class CategoriesService {
     if (e.response?.message === 'Category already exists') {
       throw new ConflictException('Category already exists');
     }
-    if (e.response?.message === 'Category not found') {
+    if (e.response?.message === 'Father category not found') {
       throw new ConflictException('Father category not found');
     }
     if (e.response?.message === 'Category not found') {

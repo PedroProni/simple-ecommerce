@@ -41,6 +41,7 @@ export class StocksService {
         .find()
         .skip((page - 1) * limit)
         .limit(limit)
+        .sort({ updated_at: -1 })
         .exec();
       return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
     } catch (e) {
@@ -111,6 +112,7 @@ export class StocksService {
         .find({ sku })
         .skip((page - 1) * limit)
         .limit(limit)
+        .sort({ updated_at: -1 })
         .exec();
       return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
     } catch (e) {
@@ -124,6 +126,7 @@ export class StocksService {
         .find({ updated_at: { $gt: updated_at } })
         .skip((page - 1) * limit)
         .limit(limit)
+        .sort({ updated_at: -1 })
         .exec();
       return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
     } catch (e) {

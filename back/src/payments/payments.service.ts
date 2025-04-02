@@ -47,6 +47,7 @@ export class PaymentsService {
         .find()
         .skip((page - 1) * limit)
         .limit(limit)
+        .sort({ updated_at: -1 })
         .exec();
       return payments.map((payment) =>
         instanceToPlain(new Payment(payment.toJSON())),
@@ -100,6 +101,7 @@ export class PaymentsService {
       .find({ payment_code: payment_code })
       .skip((page - 1) * limit)
       .limit(limit)
+      .sort({ updated_at: -1 })
       .exec();
     if (payments.length === 0) {
       throw new NotFoundException('Payment not found');
@@ -114,6 +116,7 @@ export class PaymentsService {
       .find({ updated_at: { $gt: updated_at } })
       .skip((page - 1) * limit)
       .limit(limit)
+      .sort({ updated_at: -1 })
       .exec();
     if (payments.length === 0) {
       throw new NotFoundException('Payment not found');

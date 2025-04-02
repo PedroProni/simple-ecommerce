@@ -54,6 +54,7 @@ export class PricesService {
         .find()
         .skip((page - 1) * limit)
         .limit(limit)
+        .sort({ updated_at: -1 })
         .exec();
       return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
     } catch (e) {
@@ -109,6 +110,7 @@ export class PricesService {
       .find({ sku: sku })
       .skip((page - 1) * limit)
       .limit(limit)
+      .sort({ updated_at: -1 })
       .exec();
     return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
   }
@@ -118,6 +120,7 @@ export class PricesService {
       .find({ updated_at: { $gt: updated_at } })
       .skip((page - 1) * limit)
       .limit(limit)
+      .sort({ updated_at: -1 })
       .exec();
     return prices.map((price) => instanceToPlain(new Price(price.toJSON())));
   }

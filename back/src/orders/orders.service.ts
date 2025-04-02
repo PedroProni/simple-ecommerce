@@ -70,6 +70,7 @@ export class OrdersService {
       .find()
       .skip((page - 1) * limit)
       .limit(limit)
+      .sort({ updated_at: -1 })
       .exec();
       return orders.map((order) => instanceToPlain(new Order(order.toJSON())));
     } catch (e) {
@@ -230,6 +231,7 @@ export class OrdersService {
       .findOne({ increment_id: increment_id })
       .skip((page - 1) * limit)
       .limit(limit)
+      .sort({ updated_at: -1 })
       .exec();
     if (!order) {
       throw new NotFoundException('Order not found');
@@ -242,6 +244,7 @@ export class OrdersService {
       .find({ updated_at: { $gt: updated_at } })
       .skip((page - 1) * limit)
       .limit(limit)
+      .sort({ updated_at: -1 })
       .exec();
     if (orders.length === 0) {
       throw new NotFoundException('Order not found');
