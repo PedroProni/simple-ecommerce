@@ -58,15 +58,19 @@ export class OrdersService {
     }
   }
 
-  async findAll(increment_id, updated_at) {
+  async findAll(increment_id, updated_at, limit = 10, page = 1) {
     try {
       if (increment_id) {
-        return await this.findByIncrementId(increment_id);
+        return await this.findByIncrementId(increment_id, limit, page);
       }
       if (updated_at) {
-        return await this.findByUpdatedAt(updated_at);
+        return await this.findByUpdatedAt(updated_at, limit, page);
       }
-      const orders = await this.orderModel.find().exec();
+      const orders = await this.orderModel
+      .find()
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
       return orders.map((order) => instanceToPlain(new Order(order.toJSON())));
     } catch (e) {
       await this.handleException(e);
@@ -221,9 +225,11 @@ export class OrdersService {
     return product;
   }
 
-  async findByIncrementId(increment_id: string) {
+  async findByIncrementId(increment_id: string, limit = 10, page = 1) {
     const order = await this.orderModel
       .findOne({ increment_id: increment_id })
+      .skip((page - 1) * limit)
+      .limit(limit)
       .exec();
     if (!order) {
       throw new NotFoundException('Order not found');
@@ -231,9 +237,11 @@ export class OrdersService {
     return order;
   }
 
-  async findByUpdatedAt(updated_at: Date) {
+  async findByUpdatedAt(updated_at: Date, limit = 10, page = 1) {
     const orders = await this.orderModel
       .find({ updated_at: { $gt: updated_at } })
+      .skip((page - 1) * limit)
+      .limit(limit)
       .exec();
     if (orders.length === 0) {
       throw new NotFoundException('Order not found');

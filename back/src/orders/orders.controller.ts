@@ -15,8 +15,8 @@ export class OrdersController {
   }
 
   @Get()
-  findAll(@Query('increment_id') increment_id?: string, @Query('updated_at') updated_at?: Date) {
-    return this.ordersService.findAll(increment_id, updated_at);
+  findAll(@Query('increment_id') increment_id?: string, @Query('updated_at') updated_at?: Date, @Query('limit') limit?:number, @Query('page') page?:number) {
+    return this.ordersService.findAll(increment_id, updated_at, limit, page);
   }
 
   @Get(':id')
