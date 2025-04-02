@@ -41,15 +41,19 @@ export class CategoriesService {
     }
   }
 
-  async findAll(category_code, updated_at) {
+  async findAll(category_code, updated_at, limit = 10, page = 1) {
     try {
-      if(category_code) {
-        await this.findByCategoryCode(category_code);
+      if (category_code) {
+        await this.findByCategoryCode(category_code, limit, page);
       }
-      if(updated_at) {
-        await this.findByUpdatedAt(updated_at);
+      if (updated_at) {
+        await this.findByUpdatedAt(updated_at, limit, page);
       }
-      const categories = await this.categoryModel.find().exec();
+      const categories = await this.categoryModel
+        .find()
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
       return categories.map((category) =>
         instanceToPlain(new Category(category.toJSON())),
       );
@@ -97,18 +101,29 @@ export class CategoriesService {
     return category;
   }
 
-  async findByCategoryCode(category_code: string) {
-    const category = await this.categoryModel.find({
-      category_code: category_code,
-    });
+  async findByCategoryCode(category_code: string, limit = 10, page = 1) {
+    const category = await this.categoryModel
+      .find({
+        category_code: category_code,
+      })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
     if (category.length === 0) {
       throw new NotFoundException('Category not found');
     }
     return category;
   }
 
-  async findByUpdatedAt(updated_at: Date) {
-    const categories = await this.categoryModel.find({ updated_at: { $gt: updated_at } });
+  async findByUpdatedAt(updated_at: Date, limit = 10, page = 1) {
+    const categories = await this.categoryModel
+      .find({ updated_at: { $gt: updated_at } })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+    if (categories.length === 0) {
+      throw new NotFoundException('Category not found');
+    }
     return categories.map((category) =>
       instanceToPlain(new Category(category.toJSON())),
     );

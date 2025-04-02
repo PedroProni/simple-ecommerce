@@ -13,8 +13,8 @@ export class CategoriesController {
   }
 
   @Get()
-  findAll(@Query('category_code') category_code?: string, @Query('updated_at') updated_at?: Date) {
-    return this.categoriesService.findAll(category_code, updated_at);
+  findAll(@Query('category_code') category_code?: string, @Query('updated_at') updated_at?: Date, @Query('limit') limit?:number, @Query('page') page?:number) {
+    return this.categoriesService.findAll(category_code, updated_at, limit, page);
   }
 
   @Get(':id')
