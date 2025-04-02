@@ -29,15 +29,19 @@ export class StocksService {
     }
   }
 
-  async findAll(sku, updated_at) {
+  async findAll(sku, updated_at, limit = 10, page = 1) {
     try {
       if (sku) {
-        return await this.findBySKU(sku);
+        return await this.findBySKU(sku, limit, page);
       }
       if (updated_at) {
-        return await this.findByUpdatedAt(updated_at);
+        return await this.findByUpdatedAt(updated_at, limit, page);
       }
-      const stocks = await this.stockModel.find().exec();
+      const stocks = await this.stockModel
+        .find()
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
       return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
     } catch (e) {
       await this.handleException(e);
@@ -101,19 +105,25 @@ export class StocksService {
     });
   }
 
-  async findBySKU(sku: string) {
+  async findBySKU(sku: string, limit = 10, page = 1) {
     try {
-      const stocks = await this.stockModel.find({ sku }).exec();
+      const stocks = await this.stockModel
+        .find({ sku })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
       return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
     } catch (e) {
       await this.handleException(e);
     }
   }
 
-  async findByUpdatedAt(updated_at: Date) {
+  async findByUpdatedAt(updated_at: Date, limit = 10, page = 1) {
     try {
       const stocks = await this.stockModel
         .find({ updated_at: { $gt: updated_at } })
+        .skip((page - 1) * limit)
+        .limit(limit)
         .exec();
       return stocks.map((stock) => instanceToPlain(new Stock(stock.toJSON())));
     } catch (e) {
