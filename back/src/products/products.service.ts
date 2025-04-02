@@ -176,13 +176,13 @@ export class ProductsService {
   // Method for handling exceptions
 
   async handleException(e: any) {
-    if (e.response.message === 'Product not found') {
+    if (e.response?.message === 'Product not found') {
       throw new NotFoundException('Product not found');
     }
-    if (e.response.message === 'Category not found') {
+    if (e.response?.message === 'Category not found') {
       throw new ConflictException('Category not found');
     }
-    if (e.response.message === 'Product already exists') {
+    if (e.response?.message === 'Product already exists' || e.code === 11000) {
       throw new ConflictException('Product already exists');
     }
     if (e.errors) {
@@ -191,6 +191,6 @@ export class ProductsService {
         `Required fields are missing: ${missingFields.join(', ')}`,
       );
     }
-    throw new InternalServerErrorException();
+    throw new InternalServerErrorException(e.code);
   }
 }
