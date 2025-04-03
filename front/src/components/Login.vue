@@ -23,7 +23,8 @@ import Navbar from './Navbar.vue';
             <div class="mb">
                     <a class="text-white register">Don't have an account? Register here</a>
             </div>
-        </div>     
+        </div>    
+         
     </div>
 </template>
 
@@ -43,10 +44,10 @@ import Navbar from './Navbar.vue';
     color: white;
     font-size: 2.5rem;
     font-weight: bold;
-    letter-spacing: 1px;
+    letter-spacing: 0.1rem;
     margin-bottom: 1rem;
     animation: fadeIn 500ms ease-in;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 0.5);
     text-align: center;
 }
 
@@ -84,11 +85,11 @@ import Navbar from './Navbar.vue';
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(1rem);
+    -webkit-backdrop-filter: blur(1rem);
+    border: 0.1rem solid rgba(255, 255, 255, 0.18);
+    border-radius: 1rem;
+    box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
     animation: fadeInAndDown 500ms ease-in;
 }
 
@@ -116,8 +117,9 @@ import Navbar from './Navbar.vue';
 .form-control {
     background-color: rgba(255, 255, 255, 0.8);
     border: none;
-    border-radius: 5px;
-    padding: 10px;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    width: 30rem;
     transition: all 300ms ease-in-out;
     margin: 1rem 0;
 }
@@ -125,16 +127,16 @@ import Navbar from './Navbar.vue';
 .btn-primary {
     background-color: #484b4eaf;
     border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
+    border-radius: 0.5rem;
+    padding: 1rem 2rem;
     color: white;
     transition: all 300ms ease-in-out;
     cursor: pointer;
     font-size: 1.2rem;
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.1rem;
+    box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
     animation: fadeIn 500ms ease-in;
 }
 .btn-primary:hover {
@@ -142,9 +144,9 @@ import Navbar from './Navbar.vue';
     transform: scale(1.05);
 }
 .form-check-input {
-    margin-right: 10px;
+    margin-right: 1rem;
     cursor: pointer;
-    width: 20px;
+    width: 2rem;
     background-color: rgba(255, 255, 255, 0.8);
     accent-color: #484b4e;
 }
@@ -164,7 +166,7 @@ import Navbar from './Navbar.vue';
 @keyframes fadeInAndDown {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-2rem);
     }
     to {
         opacity: 1;

@@ -7,9 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 <template>
     <div class="navbar">
-        <div class="logo">
-            <img href="/"  src="../assets/images/logo.png" alt="Logo" />
-        </div>
+        <a href="#" class="logo">
+            <img src="../assets/images/logo.png" alt="Logo" />
+        </a>
         <div class="navbar-links">
             <a>
                 Home
@@ -47,13 +47,17 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 1rem 2rem;
     background-color: rgb(17, 17, 17);
     color: white;
 }
 
 .logo img {
-    height: 50px;
+    height: 5rem;
+    width: 5rem;
+    border-radius: 50%;
+    transition: all 300ms ease-in-out;
+    cursor: pointer;
 }
 
 .navbar {
@@ -62,7 +66,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 .navbar-links {
     display: flex;
-    gap: 20px;
+    gap: 2rem;
 }
 
 .navbar-links a {
@@ -102,7 +106,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 nav {
     display: flex;
-    gap: 20px;
+    gap: 2rem;
 }
 
 nav a {
