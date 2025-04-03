@@ -13,15 +13,15 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
         <div class="navbar-links">
             <a>
                 Home
-                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem;"/>
+                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
             </a>
             <a>
                 Categories
-                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem;"/>
+                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
             </a>
             <a>
                 Pages
-                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem;"/>
+                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
             </a>
         </div>
         <nav>
@@ -81,6 +81,23 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
     position: relative;
     margin-left: 1rem;
     cursor: pointer;
+    background-image: linear-gradient(to right,
+            #6b7477b0,
+            #6b7477b0 50%,
+            #fffcfc 50%);
+    background-size: 200% 100%;
+    background-position: -100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.navbar-links a:hover {
+    background-position: 0;
+    color: #6b7477b0;
+}
+
+.navbar-links a:hover:before {
+    width: 100%;
 }
 
 nav {
