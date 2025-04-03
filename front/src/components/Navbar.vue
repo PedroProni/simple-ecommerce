@@ -12,10 +12,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
         </div>
         <div class="navbar-links">
             <a>
-                Shop
-                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem;"/>
-            </a>
-            <a>
                 Home
                 <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem;"/>
             </a>
@@ -73,6 +69,13 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
     color: white;
     text-decoration: none;
     font-size: 1.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 8rem;
     transition: all 300ms ease-in-out;
     padding: 0.1rem;
     position: relative;
