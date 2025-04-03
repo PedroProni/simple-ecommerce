@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 <template>
     <div class="navbar">
         <div class="logo">
-            <img src="#" alt="Logo" />
+            <img src="../assets/logo.png" alt="Logo" />
         </div>
         <div class="navbar-links">
             <a>
