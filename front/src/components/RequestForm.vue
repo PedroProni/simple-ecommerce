@@ -1,31 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
-const toggle = ref(false);
-
-function changeForm() {
-    toggle.value = !toggle.value
-}
-
 </script>
 
 <template>
-    <h1 class="text-center text-white title">Welcome to the Login Page</h1>
+    <h1 class="text-center text-white title">Register</h1>
     <form>
         <div class="mb form-group">
+            <label for="name" class="form-label text-white">Name: </label>
+            <input type="text" class="form-control" id="name" placeholder="Enter your name">
             <label for="email" class="form-label text-white">Email: </label>
             <input type="text" class="form-control" id="email" placeholder="Enter your email">
             <label for="password" class="form-label text-white">Password: </label>
             <input type="password" class="form-control" id="password" placeholder="Enter your password">
         </div>
-        <div class="mb">
-            <input type="checkbox" id="rememberMe" class="form-check-input">
-            <label for="rememberMe" class="form-check-label text-white">Remember Me</label>
-        </div>
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary">Signup</button>
     </form>
     <div class="mb">
-        <a @click="changeForm()" class="text-white register">Don't have an account? Register here</a>
+        <a class="text-white register">Already have an account? Login here</a>
     </div>
 </template>
 

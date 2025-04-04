@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import Navbar from '../components/Navbar.vue';
 import LoginForm from '../components/LoginForm.vue';
+import RequestForm from '../components/RequestForm.vue';
+import { ref } from 'vue';
+
+const has_account = ref(false);
+
+function toggleForm() {
+   return has_account.value = !has_account.value
+}
+
 </script>
 
 <template>
@@ -8,6 +17,7 @@ import LoginForm from '../components/LoginForm.vue';
         <Navbar class="nav-login"/>
         <div class="container">
             <LoginForm />
+            <!-- <RequestForm /> -->
         </div>    
          
     </div>

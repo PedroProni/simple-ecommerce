@@ -3,6 +3,7 @@ import { faUser, faHeart } from '@fortawesome/free-regular-svg-icons'
 import { faMagnifyingGlass, faBagShopping, faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { ref } from 'vue';
+
 const showSearch = ref(false);
 
 function toggleSearch() {
@@ -99,7 +100,7 @@ nav div .red {
     position: relative;
     margin-left: 1rem;
     cursor: pointer;
-    background-image: linear-gradient(to right,#6b7477b0,#6b7477b0 50%,#fffcfc 50%);
+    background-image: linear-gradient(to right, #6b7477b0, #6b7477b0 50%, #fffcfc 50%);
     background-size: 200% 100%;
     background-position: -100%;
     background-clip: text;
