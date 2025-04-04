@@ -2,6 +2,12 @@
 import { faUser, faHeart } from '@fortawesome/free-regular-svg-icons'
 import { faMagnifyingGlass, faBagShopping, faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { ref } from 'vue';
+const showSearch = ref(false);
+
+function toggleSearch() {
+    showSearch.value = !showSearch.value;
+}
 
 </script>
 
@@ -25,14 +31,18 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
             </a>
         </div>
         <nav>
+            <div class="search-container">
+                <input :class="{ show: showSearch }" type="text" placeholder="Search..." class="search-bar" />
+                <a>
+                    <FontAwesomeIcon :icon="faMagnifyingGlass" style="font-size: 2.5rem; cursor: pointer;"
+                        @click="toggleSearch" />
+                </a>
+            </div>
             <a href="#login">
                 <FontAwesomeIcon :icon="faUser" style="font-size: 2.5rem;" />
             </a>
             <a href="#wishlist">
                 <FontAwesomeIcon :icon="faHeart" style="font-size: 2.5rem;" />
-            </a>
-            <a href="#search">
-                <FontAwesomeIcon :icon="faMagnifyingGlass" style="font-size: 2.5rem;" />
             </a>
             <a href="#cart">
                 <FontAwesomeIcon :icon="faBagShopping" style="font-size: 2.5rem;" />
@@ -43,6 +53,10 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 </template>
 
 <style scoped>
+nav div .red {
+    background-color: red;
+}
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -91,6 +105,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
             #fffcfc 50%);
     background-size: 200% 100%;
     background-position: -100%;
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -136,5 +151,85 @@ nav a:after {
 
 nav a:hover:after {
     width: 100%;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-left: 1rem;
+    cursor: pointer;
+    transition: all 300ms ease-in-out;
+}
+
+.search-bar {
+    display: none;
+    width: 30rem;
+    height: 4rem;
+    padding: 0rem;
+    animation: growDown 300ms ease-in-out;
+}
+
+.search-bar.show {
+    display: block;
+    width: 30rem;
+    height: 4rem;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: white;
+    color: black;
+    position: absolute;
+    right: 3.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    animation: growUp 300ms ease-in-out;
+}
+
+@keyframes growUp {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 30rem;
+    }
+}
+
+@keyframes growDown {
+    from {
+        display: block;
+        width: 30rem;
+        height: 4rem;
+        padding: 0.5rem;
+        font-size: 1.2rem;
+        border: none;
+        border-radius: 0.5rem;
+        background-color: white;
+        color: black;
+        position: absolute;
+        right: 3.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    to {
+        display: block;
+        width: 0rem;
+        height: 4rem;
+        padding: 0.5rem;
+        font-size: 1.2rem;
+        border: none;
+        border-radius: 0.5rem;
+        background-color: white;
+        color: black;
+        position: absolute;
+        right: 3.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
 }
 </style>
