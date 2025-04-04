@@ -15,7 +15,7 @@
         <button type="submit" class="btn btn-primary">Signup</button>
     </form>
     <div class="mb">
-        <a class="text-white register">Already have an account? Login here</a>
+        <a class="text-white register" @click="$emit('swapForm')">Already have an account? Login here</a>
     </div>
 </template>
 
@@ -38,6 +38,10 @@
 
 .mb {
     margin-bottom: 1rem;
+}
+
+form {
+    animation: fadeIn 500ms ease-in;
 }
 
 .text-center {

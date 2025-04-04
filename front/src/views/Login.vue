@@ -4,10 +4,10 @@ import LoginForm from '../components/LoginForm.vue';
 import RequestForm from '../components/RequestForm.vue';
 import { ref } from 'vue';
 
-const has_account = ref(false);
+const isLoginForm = ref(true);
 
-function toggleForm() {
-   return has_account.value = !has_account.value
+function handleSwapForm() {
+    isLoginForm.value = !isLoginForm.value;
 }
 
 </script>
@@ -16,8 +16,8 @@ function toggleForm() {
     <div class="main-bg">
         <Navbar class="nav-login"/>
         <div class="container">
-            <LoginForm />
-            <!-- <RequestForm /> -->
+            <LoginForm v-if="isLoginForm" @swapForm="handleSwapForm()"/>
+            <RequestForm v-if="!isLoginForm" @swapForm="handleSwapForm()" />
         </div>    
          
     </div>

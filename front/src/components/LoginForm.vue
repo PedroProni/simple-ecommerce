@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
-const toggle = ref(false);
-
-function changeForm() {
-    toggle.value = !toggle.value
-}
-
 </script>
 
 <template>
@@ -25,7 +17,7 @@ function changeForm() {
         <button type="submit" class="btn btn-primary">Login</button>
     </form>
     <div class="mb">
-        <a @click="changeForm()" class="text-white register">Don't have an account? Register here</a>
+        <a @click="$emit('swapForm')" class="text-white register">Don't have an account? Register here</a>
     </div>
 </template>
 
@@ -44,6 +36,10 @@ function changeForm() {
 .register {
     text-decoration: underline;
     cursor: pointer;
+}
+
+form {
+    animation: fadeIn 500ms ease-in;
 }
 
 .mb {
