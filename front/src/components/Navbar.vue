@@ -17,19 +17,21 @@ function toggleSearch() {
         <a href="#" class="logo">
             <img src="../assets/images/logo.png" alt="Logo" />
         </a>
-        <div class="navbar-links">
-            <a>
-                Home
-                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
-            </a>
-            <a>
-                Categories
-                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
-            </a>
-            <a>
-                Pages
-                <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
-            </a>
+        <div class="mid-div">
+            <div class="navbar-links">
+                <a>
+                    Home
+                    <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
+                </a>
+                <a>
+                    Categories
+                    <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
+                </a>
+                <a>
+                    Pages
+                    <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
+                </a>
+            </div>
         </div>
         <nav>
             <div class="search-container">
@@ -73,6 +75,15 @@ nav div .red {
     border-radius: 50%;
     transition: all 300ms ease-in-out;
     cursor: pointer;
+}
+
+.mid-div {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .navbar {
