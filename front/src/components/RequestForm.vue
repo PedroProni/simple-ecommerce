@@ -34,6 +34,7 @@
 .register {
     text-decoration: underline;
     cursor: pointer;
+    animation: fadeIn 500ms ease-in;
 }
 
 .mb {
@@ -81,7 +82,6 @@ form {
     border-radius: 0.5rem;
     padding: 1rem 2rem;
     color: white;
-    transition: all 300ms ease-in-out;
     cursor: pointer;
     font-size: 1.2rem;
     font-weight: bold;

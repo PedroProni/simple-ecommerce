@@ -2,26 +2,27 @@
 </script>
 
 <template>
-    <h1 class="text-center text-white title">Welcome to the Login Page</h1>
-    <form>
-        <div class="mb form-group">
-            <label for="email" class="form-label text-white">Email: </label>
-            <input type="text" class="form-control" id="email" placeholder="Enter your email">
-            <label for="password" class="form-label text-white">Password: </label>
-            <input type="password" class="form-control" id="password" placeholder="Enter your password">
-        </div>
+        <h1 class="text-center text-white title">Login</h1>
+        <form>
+            <div class="mb form-group">
+                <label for="email" class="form-label text-white">Email: </label>
+                <input type="text" class="form-control" id="email" placeholder="Enter your email">
+                <label for="password" class="form-label text-white">Password: </label>
+                <input type="password" class="form-control" id="password" placeholder="Enter your password">
+            </div>
+            <div class="mb">
+                <input type="checkbox" id="rememberMe" class="form-check-input">
+                <label for="rememberMe" class="form-check-label text-white">Remember Me</label>
+            </div>
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
         <div class="mb">
-            <input type="checkbox" id="rememberMe" class="form-check-input">
-            <label for="rememberMe" class="form-check-label text-white">Remember Me</label>
+            <a @click="$emit('swapForm')" class="text-white register">Don't have an account? Register here</a>
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
-    <div class="mb">
-        <a @click="$emit('swapForm')" class="text-white register">Don't have an account? Register here</a>
-    </div>
 </template>
 
 <style scoped>
+
 .title {
     color: white;
     font-size: 2.5rem;
@@ -36,6 +37,7 @@
 .register {
     text-decoration: underline;
     cursor: pointer;
+    animation: fadeIn 500ms ease-in;
 }
 
 form {
@@ -83,14 +85,13 @@ form {
     border-radius: 0.5rem;
     padding: 1rem 2rem;
     color: white;
-    transition: all 300ms ease-in-out;
     cursor: pointer;
     font-size: 1.2rem;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.1rem;
     box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-    animation: fadeIn 500ms ease-in;
+    animation: fadeIn 500ms ease-in-out;
 }
 
 .btn-primary:hover {

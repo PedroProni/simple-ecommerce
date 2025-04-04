@@ -17,9 +17,8 @@ function handleSwapForm() {
         <Navbar class="nav-login"/>
         <div class="container">
             <LoginForm v-if="isLoginForm" @swapForm="handleSwapForm()"/>
-            <RequestForm v-if="!isLoginForm" @swapForm="handleSwapForm()" />
+            <RequestForm v-if="!isLoginForm" @swapForm="handleSwapForm()"/>
         </div>    
-         
     </div>
 </template>
 
