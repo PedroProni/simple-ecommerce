@@ -1,4 +1,37 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import axios from 'axios';
+import { ref } from 'vue';
+import { toast } from 'vue3-toastify';
+
+interface User {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+const user = ref<User>({
+  email: '',
+  password: '',
+  rememberMe: false,
+});
+
+
+function handleLogin() {
+  axios.post('http://localhost:3000/users/login', {
+    email: user.value.email,
+    password: user.value.password,
+  })
+  .then((response) => {
+    console.log('Login successful:', response.data.token);
+  })
+  .catch((error) => {
+    console.error('Login failed:', error.response.statusText);
+    toast.error('Login failed. Please check your credentials.');
+  });
+
+}
+
+</script>
 
 <template>
   <div class="form-container">
@@ -11,6 +44,7 @@
           class="form-control"
           id="email"
           placeholder="Enter your email"
+          v-model="user.email"
         />
         <label for="password" class="form-label text-white">Password: </label>
         <input
@@ -18,15 +52,16 @@
           class="form-control"
           id="password"
           placeholder="Enter your password"
+          v-model="user.password"
         />
       </div>
       <div class="mb">
-        <input type="checkbox" id="rememberMe" class="form-check-input" />
+        <input type="checkbox" id="rememberMe" class="form-check-input" v-model="user.rememberMe"/>
         <label for="rememberMe" class="form-check-label text-white"
           >Remember Me</label
         >
       </div>
-      <button type="submit" class="btn-primary">Login</button>
+      <button @click="handleLogin()" type="submit" class="btn-primary">Login</button>
     </form>
     <div class="mb">
       <a @click="$emit('swapForm')" class="text-white register"

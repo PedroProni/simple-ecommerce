@@ -69,6 +69,14 @@ nav div .red {
     color: white;
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    z-index: 2;
+}
+
 .logo img {
     height: 5rem;
     width: 5rem;
