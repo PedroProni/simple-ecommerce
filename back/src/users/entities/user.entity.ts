@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Types } from 'mongoose';
 
 export enum UserRole {
@@ -7,7 +7,12 @@ export enum UserRole {
   USER = 'user',
 }
 
-@Schema()
+@Schema({
+  toJSON: { virtuals: true, versionKey: false },
+  id: false,
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toObject: { virtuals: true, versionKey: false },
+})
 export class User {
   @Expose({ name: 'user_id' })
   @Prop({ default: () => new Types.ObjectId() })
@@ -21,6 +26,7 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
+  @Exclude()
   @Prop({ required: true })
   password: string;
 

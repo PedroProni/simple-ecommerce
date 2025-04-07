@@ -1,10 +1,10 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { plainToInstance } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import { hash, genSalt, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
@@ -16,24 +16,25 @@ export class UsersService {
     private jwtService: JwtService
   ) {}
 
-  private async hashPassword(password: string) {
-    const salt = await genSalt(10);
-    return hash(password, salt);
-  }
+  // Methods for managing users
 
   async create(createUserDto: CreateUserDto) {
     try {
+      const existing_user = await this.userModel.findOne({ email: createUserDto.email }).exec();
+      if (existing_user) {
+        throw new ConflictException('User already exists');
+      }
+      if (createUserDto.password?.length < 6) {
+        throw new ConflictException('Password must be at least 6 characters long');
+      }
       createUserDto.password = await this.hashPassword(createUserDto.password);
-      const createUser = new this.userModel(createUserDto);
-      const result = await createUser.save();
+      const create_user = new this.userModel(createUserDto);
+      const result = await create_user.save();
       const user = new User(result.toJSON());
       const token = await this.jwtService.signAsync({ sub: user._id, email: user.email });
       return { "token": token };
     } catch (e) {
-      if (e.code === 11000) {
-        throw new ConflictException('User already exists');
-      }
-      throw new UnauthorizedException();
+      await this.handleException(e);
     }
   }
 
@@ -52,18 +53,89 @@ export class UsersService {
   }
 
   async findAll() {
-    return plainToInstance(User, await this.userModel.find().exec(), { excludeExtraneousValues: true });
+    try {
+      const users = await this.userModel.find().exec();
+      return users.map((user) => {
+        const json_user = user.toJSON();
+        return instanceToPlain(new User(json_user));
+      });
+    } catch (e) {
+      await this.handleException(e);
+    }
   }
 
-  findOne(id: string) {
-    return plainToInstance(User, this.userModel.findById(id).exec(), { excludeExtraneousValues: true });	
+  async findOne(id: string) {
+    try {
+      const user = await this.userExists('_id', id);
+      return instanceToPlain(new User (user.toJSON()));
+    } catch (e) {
+      await this.handleException(e);
+    }
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.userModel.updateOne({ _id: id }, updateUserDto).exec();
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      await this.userExists('_id', id);
+      if (updateUserDto.password?.length < 6) {
+        throw new ConflictException('Password must be at least 6 characters long');
+      }
+      if (updateUserDto.password) {
+        updateUserDto.password = await this.hashPassword(updateUserDto.password);
+      }
+      if (updateUserDto.email) {
+        const existing_user = await this.userExists('email', updateUserDto.email);
+        if (existing_user && existing_user._id.toString() !== id) {
+          throw new ConflictException('Email already exists');
+        }
+      }
+      const updated_user = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+      return updated_user;
+    } catch (e) {
+      await this.handleException(e);
+    }
   }
 
-  remove(id: string) {
-    return this.userModel.deleteOne({ _id: id }).exec();
+  async remove(id: string) {
+    try {
+      const user = await this.userExists('_id', id);
+      this.userModel.deleteOne({ _id: id }).exec();
+      return user;
+    } catch (e) {
+      await this.handleException(e);
+    }
+  }
+
+  // Helper methods for processing and managing product-related logic
+
+  private async hashPassword(password: string) {
+    const salt = await genSalt(10);
+    return hash(password, salt);
+  }
+
+  async userExists(key: string, value: string) {
+    const user = await this.userModel.findOne({ [key]: value }).exec();
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return user;
+  }
+
+
+  private async handleException(e: any) {
+    if (e.response?.message === 'User already exists') {
+      throw new ConflictException('User already exists');
+    }
+    if (e.response?.message === 'Email already exists') {
+      throw new ConflictException('Email already exists');
+    }
+    if (e.response?.message === 'Password must be at least 6 characters long') {
+      throw new ConflictException('Password must be at least 6 characters long');
+    }
+    if (e.response?.message === 'User not found') {
+      throw new UnauthorizedException('User not found');
+    }
+    throw new InternalServerErrorException();
   }
 }
+
+
