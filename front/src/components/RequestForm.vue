@@ -32,8 +32,7 @@ function handleRegister() {
             });
         })
         .catch((e) => {
-            console.log(e)
-            toast.error('Login failed. Please check your credentials.');
+            toast.error(e.response.data.message);
         });
 
 }

@@ -22,16 +22,14 @@ function handleLogin() {
     password: user.value.password,
   })
     .then(async (response) => {
-      console.log('Login successful:', response.data.token);
       toast.success('Login successful!');
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
       await new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
         window.location.href = '/';
       });
     })
-    .catch(() => {
-      toast.error('Register failed. Please check your credentials.');
+    .catch((e) => {
+      toast.error(e.response.data.message);
     });
 
 }

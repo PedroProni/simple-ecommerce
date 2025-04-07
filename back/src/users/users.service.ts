@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Model } from 'mongoose';
@@ -38,18 +38,22 @@ export class UsersService {
     }
   }
 
-  async login(email: string, password: string,): Promise<{ token: string }> {
-    const user = await this.userModel.findOne({ email }).exec();
-    if (!user) {
-      throw new UnauthorizedException();
+  async login(email: string, password: string,) {
+    try {
+      const user = await this.userExists('email', email);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      if (!await compare(password, user.password)) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+      const payload = { sub: user._id, email: user.email };
+      return {
+        token: await this.jwtService.signAsync(payload),
+      };
+    } catch (e) {
+      await this.handleException(e);
     }
-    if (!await compare(password, user.password)) {
-      throw new UnauthorizedException();
-    }
-    const payload = { sub: user._id, email: user.email };
-    return {
-      token: await this.jwtService.signAsync(payload),
-    };
   }
 
   async findAll() {
@@ -122,6 +126,12 @@ export class UsersService {
 
 
   private async handleException(e: any) {
+    if (e.response?.message === 'User not found') {
+      throw new NotFoundException('User not found');
+    }
+    if (e.response?.message === 'Invalid credentials') {
+      throw new UnauthorizedException('Invalid credentials');
+    }
     if (e.response?.message === 'User already exists') {
       throw new ConflictException('User already exists');
     }
