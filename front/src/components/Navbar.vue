@@ -5,6 +5,21 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { ref } from 'vue';
 
 const showSearch = ref(false);
+const scrolled = ref(false);
+
+import { onMounted, onUnmounted } from 'vue';
+
+onMounted(() => {
+    window.addEventListener('scroll', hasBeenScrolled);
+});
+
+function hasBeenScrolled() {
+    if (window.scrollY > 0) {
+        scrolled.value = true;
+    } else {
+        scrolled.value = false;
+    }
+}
 
 function toggleSearch() {
     showSearch.value = !showSearch.value;
@@ -13,7 +28,7 @@ function toggleSearch() {
 </script>
 
 <template>
-    <div class="navbar">
+    <div @scroll="hasBeenScrolled()" :class="{scrolled: scrolled}"  class="navbar">
         <a href="#" class="logo">
             <img src="../assets/images/logo.png" alt="Logo" />
         </a>
@@ -65,8 +80,18 @@ nav div .red {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background-color: rgb(17, 17, 17);
+    background-color: transparent;
     color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+    transition: background-color 300ms ease-in-out;
+}
+
+.navbar.scrolled {
+    background-color: rgb(0, 0, 0);
 }
 
 .logo {
