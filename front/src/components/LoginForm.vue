@@ -21,13 +21,18 @@ function handleLogin() {
     email: user.value.email,
     password: user.value.password,
   })
-  .then((response) => {
-    console.log('Login successful:', response.data.token);
-  })
-  .catch((error) => {
-    console.error('Login failed:', error.response.statusText);
-    toast.error('Login failed. Please check your credentials.');
-  });
+    .then(async (response) => {
+      console.log('Login successful:', response.data.token);
+      toast.success('Login successful!');
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      await new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
+        window.location.href = '/';
+      });
+    })
+    .catch(() => {
+      toast.error('Register failed. Please check your credentials.');
+    });
 
 }
 
@@ -39,34 +44,19 @@ function handleLogin() {
     <form>
       <div class="mb form-group">
         <label for="email" class="form-label text-white">Email: </label>
-        <input
-          type="text"
-          class="form-control"
-          id="email"
-          placeholder="Enter your email"
-          v-model="user.email"
-        />
+        <input type="text" class="form-control" id="email" placeholder="Enter your email" v-model="user.email" />
         <label for="password" class="form-label text-white">Password: </label>
-        <input
-          type="password"
-          class="form-control"
-          id="password"
-          placeholder="Enter your password"
-          v-model="user.password"
-        />
+        <input type="password" class="form-control" id="password" placeholder="Enter your password"
+          v-model="user.password" />
       </div>
       <div class="mb">
-        <input type="checkbox" id="rememberMe" class="form-check-input" v-model="user.rememberMe"/>
-        <label for="rememberMe" class="form-check-label text-white"
-          >Remember Me</label
-        >
+        <input type="checkbox" id="rememberMe" class="form-check-input" v-model="user.rememberMe" />
+        <label for="rememberMe" class="form-check-label text-white">Remember Me</label>
       </div>
-      <button @click="handleLogin()" type="submit" class="btn-primary">Login</button>
+      <button @click.prevent="handleLogin()" type="submit" class="btn-primary">Login</button>
     </form>
     <div class="mb">
-      <a @click="$emit('swapForm')" class="text-white register"
-        >Don't have an account? Register here</a
-      >
+      <a @click="$emit('swapForm')" class="text-white register">Don't have an account? Register here</a>
     </div>
   </div>
 </template>
@@ -185,6 +175,7 @@ form {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
