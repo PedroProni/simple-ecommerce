@@ -26,7 +26,6 @@ function handleRegister() {
         .then(async (response) => {
             toast.success('Register successful!');
             localStorage.setItem('token', response.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
             await new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
                 window.location.href = '/';
             });
