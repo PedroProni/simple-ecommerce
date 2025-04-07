@@ -2,16 +2,15 @@
 import { faUser, faHeart } from '@fortawesome/free-regular-svg-icons'
 import { faMagnifyingGlass, faBagShopping, faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { onMounted } from 'vue';
 import { ref } from 'vue';
-
-const showSearch = ref(false);
-const scrolled = ref(false);
-
-import { onMounted, onUnmounted } from 'vue';
 
 onMounted(() => {
     window.addEventListener('scroll', hasBeenScrolled);
 });
+
+const showSearch = ref(false);
+const scrolled = ref(false);
 
 function hasBeenScrolled() {
     if (window.scrollY > 0) {
@@ -71,10 +70,6 @@ function toggleSearch() {
 </template>
 
 <style scoped>
-nav div .red {
-    background-color: red;
-}
-
 .navbar {
     display: flex;
     justify-content: space-between;
