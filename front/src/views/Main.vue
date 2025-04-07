@@ -1,5 +1,328 @@
 <script setup lang="ts">
 import { ref } from "vue";
+
+const products = ref([
+  {
+    "sku": "KBD1001",
+    "name": "Slim Wireless Keyboard",
+    "description": "A compact and silent wireless keyboard perfect for office use.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1587825140708-3c843977e6d3",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1002",
+    "name": "Ergonomic Wireless Mouse",
+    "description": "Designed for long hours of comfortable use with precise tracking.",
+    "status": "active",
+    "main_category": "Second",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1616627981263-e7b3e6409541",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "KBD1003",
+    "name": "Mechanical RGB Keyboard",
+    "description": "RGB backlit mechanical keyboard for gamers and coders.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1616246338693-297bb24f7b77",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1004",
+    "name": "Gaming Mouse Pro X",
+    "description": "High-precision gaming mouse with adjustable DPI and RGB lighting.",
+    "status": "active",
+    "main_category": "Second",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1618368193650-988c24555f1b",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "KBD1005",
+    "name": "Bluetooth Foldable Keyboard",
+    "description": "Portable and foldable keyboard ideal for tablets and travel.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1555617117-08fda9d9fdf1",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1006",
+    "name": "Silent Click Mouse",
+    "description": "Whisper-quiet mouse for focused workspaces and libraries.",
+    "status": "active",
+    "main_category": "Second",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1587829741301-dc798b83add3",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "KBD1007",
+    "name": "Full-Sized Office Keyboard",
+    "description": "Standard wired keyboard with numeric keypad for productivity.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1593642532973-d31b6557fa68",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1008",
+    "name": "Minimalist White Mouse",
+    "description": "A sleek and elegant mouse for modern desk setups.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1603791440384-56cd371ee9a7",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "KBD1009",
+    "name": "Backlit Laptop Keyboard",
+    "description": "Keyboard with adjustable backlighting for low-light work.",
+    "status": "active",
+    "main_category": "Second",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1573497491208-6b1acb260507",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1010",
+    "name": "Trackball Mouse",
+    "description": "Ergonomic design with a built-in trackball for precision work.",
+    "status": "active",
+    "main_category": "Second",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1581307519480-d1e0a01d25fd",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "KBD1011",
+    "name": "Aluminum Wireless Keyboard",
+    "description": "Premium aluminum body with quiet scissor-switch keys.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1606813908695-758f2aefc562",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1012",
+    "name": "RGB Wireless Gaming Mouse",
+    "description": "Rechargeable mouse with dynamic RGB and high-speed tracking.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1605902711622-cfb43c4437d1",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "KBD1013",
+    "name": "Multimedia Keyboard",
+    "description": "Includes shortcut keys for media, volume, and browser control.",
+    "status": "active",
+    "main_category": "Second",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1585076486312-c3d1e3fc5dfc",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1014",
+    "name": "Bluetooth Travel Mouse",
+    "description": "Compact and easy to carry with a durable battery life.",
+    "status": "active",
+    "main_category": "Second",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1612817154859-4c1c7d70c3e5",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "KBD1015",
+    "name": "Low-Profile Keyboard",
+    "description": "Sleek low-profile keyboard with soft-touch keys for quiet typing.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1623776053397-7c7c1c0d264d",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1016",
+    "name": "Silent Wireless Mouse",
+    "description": "Click-free mouse with long battery life and ergonomic design.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1620121692029-d088224ddc49",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "KBD1017",
+    "name": "Wireless Numeric Keypad",
+    "description": "Ideal companion for laptops or compact keyboards.",
+    "status": "active",
+    "main_category": "Second",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1582131503261-70e9c1c2b8a6",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1018",
+    "name": "Vertical Mouse",
+    "description": "Vertical grip to reduce wrist strain during extended use.",
+    "status": "active",
+    "main_category": "Second",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1603398938378-e8ab3f89b5d3",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "KBD1019",
+    "name": "Compact Bluetooth Keyboard",
+    "description": "Pairs with multiple devices and fits easily into any bag.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1608379531566-6574c580b310",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  },
+  {
+    "sku": "MSE1020",
+    "name": "Rechargeable Mouse",
+    "description": "Recharge via USB-C and enjoy weeks of uninterrupted work.",
+    "status": "active",
+    "main_category": "Main",
+    "um": "UN",
+    "brand": "Ralph Lauren",
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1612810805462-4e22ee5bde65",
+        "position": 1,
+        "main_image": true
+      }
+    ]
+  }
+]);
 </script>
 
 <template>
@@ -37,25 +360,11 @@ import { ref } from "vue";
                     </div>
                 </div>
                 <div class="products">
-                    <div class="product">
-                        <img src="https://i5.walmartimages.com/seo/Razer-BlackWidow-Wired-Mechanical-Gaming-Keyboard-for-PC-Chroma-RGB-Lighting-Black_72fd417f-74ca-44ef-8862-b432f1e715ca.d7d96d5ea55f1d5547248f161a560f6f.jpeg"
-                            alt="Product 1" />
+                    <div v-for="product in products" :key="product.name" class="product">
+                        <img :src="product.images[0].url" :alt="product.name"/>
                         <button class="overview">OVERVIEW</button>
-                        <a>Product 1</a>
+                        <a>{{ product.name }}</a>
                         <p>$19.99</p>
-                    </div>
-                    <div class="product">
-                        <img src="https://a-static.mlcdn.com.br/1500x1500/mouse-gamer-logitech-g-prox-wireless-sem-fio-preto/logitechstoreoficial/39625/c98a82b93283539cc6b893232880eebf.jpeg"
-                            alt="Product 2" />
-                        <button class="overview">OVERVIEW</button>
-                        <a>Product 2</a>
-                        <p>$29.99</p>
-                    </div>
-                    <div class="product">
-                        <img src="https://fujiokadistribuidor.vteximg.com.br/arquivos/ids/171305" alt="Product 3" />
-                        <button class="overview">OVERVIEW</button>
-                        <a>Product 3</a>
-                        <p>$39.99</p>
                     </div>
                 </div>
             </div>
@@ -171,9 +480,13 @@ import { ref } from "vue";
 
 .content-container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
     padding: 2rem;
+    gap: 5rem;
+    width: 100%;
 }
 
 .categories {
@@ -181,6 +494,10 @@ import { ref } from "vue";
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    padding-top: 4rem;
+    height: 100%;
 }
 
 .category {
@@ -223,7 +540,7 @@ import { ref } from "vue";
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
     height: 100%;
