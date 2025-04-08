@@ -81,7 +81,7 @@ const getMoreProducts = () => {
                 </div>
             </div>
             <div class="banner-image">
-                <img src="../assets/images/mouse.png" alt="Banner" />
+                <img src="../assets/images/mouse.png" alt="Banner" class="animated-image"/>
             </div>
         </div>
         <div class="container-light">
@@ -109,6 +109,18 @@ const getMoreProducts = () => {
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="second-banner">
+            <div class="second-banner-text">
+                <h2 class="second-banner-title">ULTRA<br>BOOST</h2>
+                <button class="second-banner-button" >SHOP NOW</button>
+            </div>
+            <div class="second-banner-image-div">
+                <img src="../assets/images/headset.png" alt="headset" class="second-banner-image" />
+            </div>
+        </div>
+        <div class="container-light">
+
         </div>
     </div>
 </template>
@@ -202,15 +214,6 @@ const getMoreProducts = () => {
 
 .banner-image img {
     transition: all 300ms ease-in-out;
-}
-
-.banner-footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    margin-top: 2rem;
-    transform: translateY(-6rem);
 }
 
 .container-light {
@@ -340,8 +343,7 @@ const getMoreProducts = () => {
   color: black;
   font-size: 1.5rem;
   font-weight: 500;
-  padding: 1rem 2rem;
-  border-radius: 5px;
+  padding: 2rem 6rem;
   border: 0.1rem solid black;
   cursor: pointer;
   transition: all 300ms ease-in-out;
@@ -371,6 +373,65 @@ const getMoreProducts = () => {
 
 .product:hover .overview {
     animation: growUp 0.3s ease-in-out forwards;
+}
+
+.second-banner {
+    background-image: linear-gradient(rgba(03, 03, 03, 0.8), rgba(03, 03, 03, 0.8)), url("../assets/images/second-banner.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 60vh;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    z-index: 1;
+    overflow: hidden;
+    transition: all 300ms ease-in-out;
+    padding: 0 10rem;
+}
+
+.second-banner-image {
+    width: 50%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.6);
+}
+
+.second-banner-text {
+    color: white;
+    text-align: right;
+    font-size: 5rem;
+    font-weight: 800;
+    width: 50%;
+    padding: 2rem;
+}
+
+.second-banner-title {
+    font-size: 8rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.second-banner-button {
+    background-color: white;
+    color: black;
+    height: 5rem;
+    width: 15rem;
+    font-size: 2rem;
+    font-weight: 500;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: all 300ms ease-in-out;
+    z-index: 1000;
+    position: relative;
+}
+
+.second-banner-button:hover {
+    background-color: black;
+    color: white;
 }
 
 @keyframes growUp {
