@@ -41,8 +41,11 @@ export class ProductsService {
     }
   }
 
-  async findAll(sku, updated_at, limit = 10, page = 1) {
+  async findAll(sku, updated_at, main_category, limit = 10, page = 1) {
     try {
+      if (main_category) {
+        return await this.findByCategoryCode(main_category);
+      };
       if (sku) {
         return await this.findBySKU(sku, limit, page);
       };
@@ -158,6 +161,31 @@ export class ProductsService {
         .limit(limit)
         .sort({ updated_at: -1 })
         .exec();
+      return products.map((product) => {
+        const jsonProduct = product.toJSON();
+        jsonProduct.prices = jsonProduct.prices.map(
+          (price) => new Price(price),
+        );
+        jsonProduct.stocks = jsonProduct.stocks.map(
+          (stock) => new Stock(stock),
+        );
+        return instanceToPlain(new Product(jsonProduct));
+      });
+    } catch (e) {
+      await this.handleException(e);
+    }
+  }
+
+  async findByCategoryCode(category_code: string,) {
+    try {
+      const products = await this.productModel
+        .find({ main_category: category_code })
+        .populate('stocks')
+        .populate('prices')
+        .exec();
+      if (products.length === 0) {
+        throw new NotFoundException('Product not found');
+      }
       return products.map((product) => {
         const jsonProduct = product.toJSON();
         jsonProduct.prices = jsonProduct.prices.map(

@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Delete, Put, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, Query, SetMetadata } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
+export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -13,8 +15,9 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(@Query('sku') sku?: string, @Query('updated_at') updated_at?: Date, @Query('limit') limit?:number, @Query('page') page?:number) {
-    return this.productsService.findAll(sku, updated_at, limit, page);
+  @Public()
+  findAll(@Query('sku') sku?: string, @Query('updated_at') updated_at?: Date, @Query('limit') limit?:number, @Query('page') page?:number, @Query('main_category') main_category?:string) {
+    return this.productsService.findAll(sku, updated_at, main_category, limit, page);
   }
 
   @Get(':id')
