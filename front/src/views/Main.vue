@@ -16,9 +16,9 @@ interface Category {
 }
 
 onMounted(() => {
-    axios.get("http://localhost:3000/products").then((response) => {
+    axios.get("http://localhost:3000/products?limit=12").then((response) => {
         products.value = response.data;
-        productsFiltered.value = response.data;
+        products_filtered.value = response.data;
     }).catch((error) => {
         console.error("Error fetching products:", error);
     });
@@ -34,16 +34,36 @@ onMounted(() => {
 
 const categories = ref<Category[]>([]);
 const products = ref<Product[]>([]);
-const productsFiltered = ref<Product[]>([]);
+const products_filtered = ref<Product[]>([]);
+const current_page = ref(1);
+
 
 const filterCategory = (category_code: string) => {
-    axios.get(`http://localhost:3000/products?main_category=${category_code}`).then((response) => {
-      productsFiltered.value = response.data;
-    }).then(() => {
-        console.log(productsFiltered.value);
-    1}).catch((error) => {
-        console.error("Error fetching products by category:", error);
-    });
+  console.log(category_code);
+  if (category_code === "") {
+    current_page.value = 1;
+  } else {
+    current_page.value = 3;
+  }
+  axios.get(`http://localhost:3000/products?main_category=${category_code}&limit=12`).then((response) => {
+    products_filtered.value = response.data;
+  }).then(() => {
+    console.log(products_filtered.value);
+  }).catch((error) => {
+    console.error("Error fetching products by category:", error);
+  });
+}
+
+const getMoreProducts = () => {
+  current_page.value += 1;
+  const url = `http://localhost:3000/products?page=${current_page.value}&limit=12`;
+
+  axios.get(url).then((response) => {
+    console.log(response.data);
+    products_filtered.value.push(...response.data);
+  }).catch((error) => {
+    console.error("Error fetching more products:", error);
+  });
 }
 </script>
 
@@ -78,16 +98,18 @@ const filterCategory = (category_code: string) => {
                     </div>
                 </div>
                 <div class="products">
-                    <div v-for="product in productsFiltered" :key="product.name" class="product">
+                    <div v-for="product in products_filtered" :key="product.name" class="product">
                         <img :src="product.images[0].url" :alt="product.name"/>
                         <button class="overview">OVERVIEW</button>
                         <a>{{ product.name }}</a>
-                        <p>$ {{ product.prices[0]?.price.toFixed(2) }}</p>
+                        <p> {{ product.prices[0]?.price ? `$ ${product.prices[0]?.price.toFixed(2)}` : 'No prices available'  }}</p>
+                    </div>
+                    <div class="button-div">
+                        <button v-if="current_page !== 3" @click="getMoreProducts()" class="load-button">LOAD MORE</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="banner"></div>
     </div>
 </template>
 
@@ -193,7 +215,7 @@ const filterCategory = (category_code: string) => {
 
 .container-light {
     background-color: rgb(230, 230, 230);
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
 }
 
@@ -209,14 +231,14 @@ const filterCategory = (category_code: string) => {
 }
 
 .categories {
-    width: 10rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    justify-content: center;;
-    align-items: flex-start;
-    padding-top: 4rem;
-    height: 100%;
+  width: 19rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 4rem;
+  height: 100%;
 }
 
 .category {
@@ -265,6 +287,8 @@ const filterCategory = (category_code: string) => {
     width: 100%;
     height: 100%;
     padding: 2rem;
+    border-left: 0.1rem solid #ccc;
+    overflow: hidden;
 }
 
 .product {
@@ -296,10 +320,37 @@ const filterCategory = (category_code: string) => {
     height: 70%;
     object-fit: cover;
     transition: all 300ms ease-in-out;
+    background-color: white;
 }
 
 .product:hover img {
     transition: all 300ms ease-in-out;
+}
+
+.button-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.load-button {
+  background-color: transparent;
+  color: black;
+  font-size: 1.5rem;
+  font-weight: 500;
+  padding: 1rem 2rem;
+  border-radius: 5px;
+  border: 0.1rem solid black;
+  cursor: pointer;
+  transition: all 300ms ease-in-out;
+  margin-top: 2rem;
+}
+
+.load-button:hover {
+    background-color: black;
+    color: white;
 }
 
 .overview {
