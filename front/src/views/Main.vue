@@ -69,7 +69,7 @@ const filterCategory = (category_code: string) => {
                 <div class="categories">
                     <label class="title-category" for="categories">SHOP BY:</label>
                     <div class="category">
-                        <input type="radio" id="all" name="categories" @click="filterCategory('')"/>
+                        <input type="radio" id="all" name="categories" @click="filterCategory('')" checked/>
                         <label for="all">All</label>
                     </div>
                     <div v-for="category in categories" :key="category.name" class="category">
