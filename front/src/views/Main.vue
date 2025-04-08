@@ -425,7 +425,7 @@ const getMoreProducts = () => {
     border: none;
     cursor: pointer;
     transition: all 300ms ease-in-out;
-    z-index: 1000;
+    z-index: 1;
     position: relative;
 }
 
