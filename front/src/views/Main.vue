@@ -65,6 +65,16 @@ const getMoreProducts = () => {
     console.error("Error fetching more products:", error);
   });
 }
+
+const nextProduct = () => {
+  const container = document.querySelector(".new-products") as HTMLElement;
+  container.scrollBy({ left: container.offsetWidth, behavior: "smooth" });
+}
+
+const previousProduct = () => {
+  const container = document.querySelector(".new-products") as HTMLElement;
+  container.scrollBy({ left: -container.offsetWidth, behavior: "smooth" });
+}
 </script>
 
 <template>
@@ -119,8 +129,28 @@ const getMoreProducts = () => {
                 <img src="../assets/images/headset.png" alt="headset" class="second-banner-image" />
             </div>
         </div>
-        <div class="container-light">
-
+        <div class="small-container-light">
+            <div class="title-new-products">
+                <h2>NEW PRODUCTS</h2>
+            </div>
+            <div class="new-products-container">
+                <button @click="previousProduct()" class="previous-button"><</button>
+                <div class="new-products">
+                    <div v-for="product in products_filtered" :key="product.name" class="product">
+                        <img :src="product.images[0].url" :alt="product.name"/>
+                        <button class="overview">OVERVIEW</button>
+                        <a>{{ product.name }}</a>
+                        <p> {{ product.prices[0]?.price ? `$ ${product.prices[0]?.price.toFixed(2)}` : 'No prices available'  }}</p>
+                    </div>
+                </div>
+                <button @click="nextProduct()" class="next-button">></button>
+            </div>
+        </div>
+        <div class="third-banner">
+            <div class="third-banner-text">
+                <h2 class="third-banner-title">EXPLORE OUR PRODUCTS</h2>
+                <button class="third-banner-button" >SHOP NOW</button>
+            </div>
         </div>
     </div>
 </template>
@@ -290,6 +320,7 @@ const getMoreProducts = () => {
     width: 100%;
     height: 100%;
     padding: 2rem;
+    position: relative;
     border-left: 0.1rem solid #ccc;
     overflow: hidden;
 }
@@ -380,7 +411,7 @@ const getMoreProducts = () => {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    height: 60vh;
+    height: 40vh;
     width: 100%;
     display: flex;
     justify-content: space-evenly;
@@ -430,6 +461,139 @@ const getMoreProducts = () => {
 }
 
 .second-banner-button:hover {
+    background-color: black;
+    color: white;
+}
+
+.small-container-light {
+    background-color: rgb(230, 230, 230);
+    min-height: 40vh;
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    margin-top: 3rem;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+.small-container-light h2 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: black;
+    margin-bottom: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    top: 0;
+}
+
+.new-products {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    width: 84%;
+    gap: 2rem;
+    padding: 2rem;
+    scroll-behavior: smooth;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.new-products .product {
+    flex: 0 0 auto;
+}
+
+.new-products .product:hover img {
+    box-shadow: none;
+}
+
+.next-button, .previous-button {
+    background-color: rgba(0, 0, 0, 0.5);
+    gap: 1rem;
+    color: white;
+    font-size: 2rem;
+    font-weight: 500;
+    padding: 1rem 2rem;
+    border: none;
+    cursor: pointer;
+    transition: all 300ms ease-in-out;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    border-radius: 50%;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.next-button:hover, .previous-button:hover {
+    transform: scale(1.2);
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.new-products-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.third-banner {
+    background-image: linear-gradient(rgba(03, 03, 03, 0.8), rgba(03, 03, 03, 0.8)), url("../assets/images/computer.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 40vh;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    z-index: 1;
+    overflow: hidden;
+    transition: all 300ms ease-in-out;
+    padding: 0 10rem;
+}
+
+.third-banner-text {
+    color: white;
+    text-align: center;
+    font-size: 5rem;
+    font-weight: 800;
+    width: 50%;
+    padding: 2rem;
+}
+
+.third-banner-title {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.third-banner-button {
+    background-color: white;
+    color: black;
+    height: 5rem;
+    width: 15rem;
+    font-size: 2rem;
+    font-weight: 500;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: all 300ms ease-in-out;
+    z-index: 1;
+    position: relative;
+}
+.third-banner-button:hover {
     background-color: black;
     color: white;
 }
