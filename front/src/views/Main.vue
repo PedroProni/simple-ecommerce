@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import axios from "axios";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faAngleLeft, faAngleRight, faHeadset, faTentArrowTurnLeft, faTruckFast } from '@fortawesome/free-solid-svg-icons'
 import { onMounted } from "vue";
 import { ref } from "vue";
+import { faCreditCard } from "@fortawesome/free-regular-svg-icons";
 
 interface Product {
     name: string;
@@ -134,7 +137,7 @@ const previousProduct = () => {
                 <h2>NEW PRODUCTS</h2>
             </div>
             <div class="new-products-container">
-                <button @click="previousProduct()" class="previous-button"><</button>
+                <button @click="previousProduct()" class="previous-button"><a><FontAwesomeIcon :icon="faAngleLeft"/></a></button>
                 <div class="new-products">
                     <div v-for="product in products_filtered" :key="product.name" class="product">
                         <img :src="product.images[0].url" :alt="product.name"/>
@@ -143,14 +146,43 @@ const previousProduct = () => {
                         <p> {{ product.prices[0]?.price ? `$ ${product.prices[0]?.price.toFixed(2)}` : 'No prices available'  }}</p>
                     </div>
                 </div>
-                <button @click="nextProduct()" class="next-button">></button>
+                <button @click="nextProduct()" class="next-button"><a><FontAwesomeIcon :icon="faAngleRight"/></a></button>
             </div>
         </div>
         <div class="third-banner">
             <div class="third-banner-text">
                 <h2 class="third-banner-title">EXPLORE OUR PRODUCTS</h2>
-                <button class="third-banner-button" >SHOP NOW</button>
+                <button class="third-banner-button">SHOP NOW</button>
             </div>
+        </div>
+        <div class="inner-container-black">
+            <div class="inner-container">
+                <div class="customer-div">
+                    <a><FontAwesomeIcon :icon="faHeadset" style="height: 3rem;"/></a>
+                    <h3>CUSTOMER SUPPORT</h3>
+                    <p>Need assistance?</p>
+                    <div class="explanation-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet nesciunt, odit quam eius distinctio iure eos, unde et sequi, perspiciatis nulla? Ad nihil voluptas sequi velit similique omnis, iure laboriosam.</div>
+                </div>
+                <div class="payment-div">
+                    <a><FontAwesomeIcon :icon="faCreditCard" style="height: 3rem;"/></a>
+                    <h3>SECURE PAYMENT</h3>
+                    <p>Safe & Fast</p>
+                    <div class="explanation-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum nihil, incidunt, in at veritatis natus, qui assumenda debitis quae impedit nisi omnis. Distinctio odit laudantium harum officia vero ullam dicta?</div>
+                </div>
+                <div class="returns-div">
+                    <a><FontAwesomeIcon :icon="faTentArrowTurnLeft" style="height: 3rem;"/></a>
+                    <h3>FREE RETURNS</h3>
+                    <p>30 Days Money Back</p> 
+                    <div class="explanation-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. At eveniet aperiam hic dolor neque, aliquid sit ducimus ut harum! Similique quisquam obcaecati ducimus fuga vero accusamus fugiat. Fugiat, consequuntur eaque.</div>
+                </div>
+                <div class="shipping-div">
+                    <a><FontAwesomeIcon :icon="faTruckFast" style="height: 3rem;"/></a>
+                    <h3>FREE SHIPPING</h3>
+                    <p>On orders over $50</p>
+                    <div class="explanation-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates tempore, odio necessitatibus atque voluptatibus aliquam? Ab totam omnis laborum dolorem est suscipit odio praesentium voluptatem ea? Ipsa tempora architecto dolor.</div>
+                </div>
+            </div>
+            <div class="separation-container"></div>
         </div>
     </div>
 </template>
@@ -183,6 +215,7 @@ const previousProduct = () => {
     top: 50%;
     transform: translateY(-50%);
     color: white;
+    z-index: 2;
 }
 
 .season-title {
@@ -220,7 +253,7 @@ const previousProduct = () => {
     font-size: 2rem;
     font-weight: 500;
     padding: 1rem 2rem;
-    border-radius: 5px;
+    border-radius: 0.5rem;
     border: none;
     cursor: pointer;
     transition: all 300ms ease-in-out;
@@ -240,6 +273,8 @@ const previousProduct = () => {
     position: absolute;
     right: 0;
     transform: scale(1.5);
+    z-index: 1;
+    overflow: hidden;
 }
 
 .banner-image img {
@@ -452,7 +487,7 @@ const previousProduct = () => {
     font-size: 2rem;
     font-weight: 500;
     padding: 1rem 2rem;
-    border-radius: 5px;
+    border-radius: 0.5rem;
     border: none;
     cursor: pointer;
     transition: all 300ms ease-in-out;
@@ -471,7 +506,6 @@ const previousProduct = () => {
     width: 100%;
     padding: 2rem;
     display: flex;
-    margin-top: 3rem;
     flex-direction: column;
     align-items: center;
     overflow: hidden;
@@ -594,7 +628,7 @@ const previousProduct = () => {
     font-size: 2rem;
     font-weight: 500;
     padding: 1rem 2rem;
-    border-radius: 5px;
+    border-radius: 0.5rem;
     border: none;
     cursor: pointer;
     transition: all 300ms ease-in-out;
@@ -605,6 +639,80 @@ const previousProduct = () => {
     background-color: black;
     color: white;
 }
+.inner-container-black {
+    background-color: rgba(04, 04, 04, 1);
+    padding: 2rem;
+    min-height: 20vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.inner-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    gap: 5rem;
+}
+
+.separation-container {
+    width: 90%;
+    height: 0.1rem;
+    background-color: rgb(56, 53, 53);
+    margin-top: 2rem;
+    position: relative;
+}
+
+.customer-div, .payment-div, .returns-div, .shipping-div {
+    padding-top: 3rem;
+    width: 25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    font-size: 2rem;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: 0.1rem;
+}
+
+.customer-div a, .payment-div a, .returns-div a, .shipping-div a {
+    color: white;
+    font-size: 3rem;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.customer-div h3, .payment-div h3, .returns-div h3, .shipping-div h3 {
+    font-size: 2rem;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+}
+.customer-div p, .payment-div p, .returns-div p, .shipping-div p {
+    font-size: 1.2rem;
+    color: lightgray;
+    font-weight: 300;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+}
+.explanation-text {
+    font-size: 1.2rem;
+    color: gray;
+    font-weight: 300;
+    text-align: center;
+    max-width: 30rem;
+}
+
 
 @keyframes growUp {
     0% {

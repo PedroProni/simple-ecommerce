@@ -22,16 +22,6 @@ function handleSwapForm() {
 </template>
 
 <style scoped>
-.nav-login {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  background-color: transparent;
-  transition: all 300ms ease-in-out;
-  animation: fadeIn 500ms ease-in;
-}
 
 .register-form {
   padding: 2rem;
@@ -55,7 +45,6 @@ function handleSwapForm() {
 
 .main-bg {
   height: 100vh;
-  width: 100vw;
   background-image: url("../assets/images/login.png");
   background-repeat: no-repeat;
   background-size: cover;
