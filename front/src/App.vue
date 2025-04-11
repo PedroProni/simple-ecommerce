@@ -4,7 +4,7 @@ import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <Navbar v-if="$route.name !== 'Login'"/>
+  <Navbar/>
   <RouterView />
 </template>
 

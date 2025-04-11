@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Navbar from "../components/Navbar.vue";
 import LoginForm from "../components/LoginForm.vue";
 import RequestForm from "../components/RequestForm.vue";
 import { ref } from "vue";
@@ -13,7 +12,6 @@ function handleSwapForm() {
 
 <template>
   <div class="main-bg">
-    <Navbar class="nav-login" />
     <div class="container">
       <div class="forms-wrapper" :class="{ 'show-register': !isLoginForm }">
         <LoginForm class="login-form" @swapForm="handleSwapForm()" />
@@ -32,7 +30,7 @@ function handleSwapForm() {
   z-index: 1;
   background-color: transparent;
   transition: all 300ms ease-in-out;
-  animation: fadeInAndDown 500ms ease-in;
+  animation: fadeIn 500ms ease-in;
 }
 
 .register-form {
@@ -85,7 +83,7 @@ function handleSwapForm() {
   border: 0.1rem solid rgba(255, 255, 255, 0.18);
   border-radius: 1rem;
   box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-  animation: fadeInAndDown 500ms ease-in;
+  animation: fadeIn 500ms ease-in;
   overflow: hidden;
   position: relative;
 }

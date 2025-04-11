@@ -83,7 +83,7 @@ function toggleSearch() {
     width: 100%;
     z-index: 2;
     transition: background-color 300ms ease-in-out;
-    animation: fadeIn 300ms ease-in-out;
+    animation: fadeInAndDown 500ms ease-in-out;
 }
 
 .navbar.scrolled {
@@ -281,5 +281,16 @@ nav a:hover:after {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+@keyframes fadeInAndDown {
+  from {
+    opacity: 0;
+    transform: translateY(-2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

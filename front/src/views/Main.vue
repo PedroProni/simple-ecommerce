@@ -533,8 +533,16 @@ const previousProduct = () => {
     align-items: center;
 }
 
+.previous-button {
+    margin-right: 1rem;
+    left: 0;
+}
+.next-button {
+    margin-left: 1rem;
+    right: 0;
+}
+
 .next-button:hover, .previous-button:hover {
-    transform: scale(1.2);
     background-color: rgba(0, 0, 0, 0.8);
 }
 
@@ -615,12 +623,10 @@ const previousProduct = () => {
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-2rem);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 </style>
