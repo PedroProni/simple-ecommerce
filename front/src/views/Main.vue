@@ -90,7 +90,7 @@ const previousProduct = () => {
                     <h4 class="discount-value">50% off</h4>
                 </div>
                 <div class="banner-button">
-                    <button>SHOP NOW</button>
+                    <button @click="$router.push('/products')">SHOP NOW</button>
                 </div>
             </div>
             <div class="banner-image">
@@ -126,7 +126,7 @@ const previousProduct = () => {
         <div class="second-banner">
             <div class="second-banner-text">
                 <h2 class="second-banner-title">ULTRA<br>BOOST</h2>
-                <button class="second-banner-button" >SHOP NOW</button>
+                <button @click="$router.push('/products')" class="second-banner-button" >SHOP NOW</button>
             </div>
             <div class="second-banner-image-div">
                 <img src="../assets/images/headset.png" alt="headset" class="second-banner-image" />
@@ -152,7 +152,7 @@ const previousProduct = () => {
         <div class="third-banner">
             <div class="third-banner-text">
                 <h2 class="third-banner-title">EXPLORE OUR PRODUCTS</h2>
-                <button class="third-banner-button">SHOP NOW</button>
+                <button @click="$router.push('/products')" class="third-banner-button">SHOP NOW</button>
             </div>
         </div>
         <div class="inner-container-black">

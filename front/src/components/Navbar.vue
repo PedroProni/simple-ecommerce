@@ -33,10 +33,7 @@ function toggleSearch() {
         </a>
         <div class="mid-div">
             <div class="navbar-links">
-                <a>
-                    Home
-                    <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
-                </a>
+                <a @click="$router.push('/')">Home</a>
                 <a>
                     Categories
                     <FontAwesomeIcon :icon="faAngleDown" style="font-size: 1.5rem; margin-left: 0.1rem;" />
