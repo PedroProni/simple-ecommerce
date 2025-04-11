@@ -5,6 +5,7 @@ import { faAngleLeft, faAngleRight, faHeadset, faTentArrowTurnLeft, faTruckFast 
 import { onMounted } from "vue";
 import { ref } from "vue";
 import { faCreditCard } from "@fortawesome/free-regular-svg-icons";
+import { toast } from "vue3-toastify";
 
 interface Product {
     name: string;
@@ -23,6 +24,7 @@ onMounted(() => {
         products.value = response.data;
         products_filtered.value = response.data;
     }).catch((error) => {
+        toast.error("Error fetching products");
         console.error("Error fetching products:", error);
     });
 
@@ -31,6 +33,7 @@ onMounted(() => {
     }).then(() => {
         console.log(categories.value);
     }).catch((error) => {
+        toast.error("Error fetching categories");
         console.error("Error fetching categories:", error);
     });
 })
