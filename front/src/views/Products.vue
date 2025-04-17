@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
+import { faUpLong } from '@fortawesome/free-solid-svg-icons';
 import axios from "axios";
 import { onMounted, ref } from "vue";
 import { toast } from "vue3-toastify";
@@ -21,6 +22,7 @@ const categories = ref<Category[]>([]);
 const products = ref<Product[]>([]);
 const products_filtered = ref<Product[]>([]);
 const price_range = ref(0);
+const arrow_up = ref(true);
 
 onMounted(() => {
     axios.get("http://localhost:3000/products?limit=15").then((response) => {
@@ -40,6 +42,11 @@ onMounted(() => {
         console.error("Error fetching categories:", error);
     });
 })
+
+const changeSortOrder = () => {
+    arrow_up.value = !arrow_up.value;
+}
+
 </script>
 
 <template>
@@ -73,7 +80,27 @@ onMounted(() => {
                 </div>
             </div>
             <div class="products">
-                <div class="toolbar"></div>
+                <div class="toolbar">
+                    <div class="sort-by">
+                        <a class="menu-title">Sort by:</a>
+                        <select class="menu-select">
+                            <option value="position">Position</option>
+                            <option value="name">Name</option>
+                            <option value="price">Price</option>
+                        </select>
+                        <span class="arrow" :class="arrow_up ? 'arrow-up' : 'arrow-down'" @click="changeSortOrder()">
+                            <FontAwesomeIcon :icon="faUpLong" />
+                        </span>
+                    </div>
+                    <div class="show">
+                        <a class="menu-title">Show:</a>
+                        <select class="menu-select">
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="products-list">
                     <div v-for="product in products_filtered" :key="product.name" class="product">
                         <img :src="product.images[0].url" :alt="product.name" />
@@ -208,6 +235,9 @@ onMounted(() => {
 .products {
     display: flex;
     width: 80%;
+    min-height: 100vh;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .products-list {
@@ -216,7 +246,7 @@ onMounted(() => {
     gap: 2rem;
     width: 100%;
     max-height: 100%;
-    padding: 2rem;
+    padding: 0.5rem;
     position: relative;
 }
 
@@ -287,6 +317,73 @@ onMounted(() => {
     color: red;
 }
 
+.toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 80%;
+}
+
+.sort-by,
+.show {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.menu-title {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: rgb(63, 63, 63, 1);
+    text-decoration: none;
+}
+
+.menu-select {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: rgb(63, 63, 63, 1);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    background-color: white;
+    transition: all 300ms ease-in-out;
+}
+
+.menu-select option {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: rgb(63, 63, 63, 1);
+    background-color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    text-decoration: none;
+}
+
+.sort-by select:hover {
+    box-shadow: 0.2rem 0.2rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.arrow {
+    cursor: pointer;
+}
+
+.arrow-up {
+    transform: rotate(0deg);
+    transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+}
+
+.arrow-down {
+    transform: rotate(180deg);
+    transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+}
 
 @keyframes growUp {
     0% {
