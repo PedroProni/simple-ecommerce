@@ -72,7 +72,7 @@ const changeSortOrder = () => {
                     </div>
                     <div class="filter-price">
                         <h3>Price</h3>
-                        <input type="range" min="0" max="10000" step="1" v-model="price_range" />
+                        <input type="range" min="0" max="1000" step="1" v-model="price_range" />
                         <div class="price-range">
                             <span class="price-text" v-if="price_range != 0">$0.00 - ${{ price_range }}.00</span>
                         </div>
@@ -173,11 +173,13 @@ const changeSortOrder = () => {
 
 .filters {
     width: 20%;
-    height: 100vh;
+    height: 120vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .inner-filter {
-    padding: 2rem;
     display: flex;
     flex-direction: column;
 }
