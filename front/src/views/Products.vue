@@ -23,6 +23,9 @@ const products = ref<Product[]>([]);
 const products_filtered = ref<Product[]>([]);
 const price_range = ref(0);
 const arrow_up = ref(true);
+const selected_sort_option = ref("position");
+const selected_show_option = ref(15);
+const selected_category = ref("all");
 
 onMounted(() => {
     axios.get("http://localhost:3000/products?limit=15").then((response) => {
@@ -83,7 +86,7 @@ const changeSortOrder = () => {
                 <div class="toolbar">
                     <div class="sort-by">
                         <a class="menu-title">Sort by:</a>
-                        <select class="menu-select">
+                        <select class="menu-select" v-model="selected_sort_option">
                             <option value="position">Position</option>
                             <option value="name">Name</option>
                             <option value="price">Price</option>
@@ -94,7 +97,9 @@ const changeSortOrder = () => {
                     </div>
                     <div class="show">
                         <a class="menu-title">Show:</a>
-                        <select class="menu-select">
+                        <select 
+                        class="menu-select"
+                        v-model="selected_show_option">
                             <option value="15">15</option>
                             <option value="30">30</option>
                             <option value="45">45</option>
@@ -173,10 +178,12 @@ const changeSortOrder = () => {
 
 .filters {
     width: 20%;
-    height: 120vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    gap: 2rem;
+    padding: 1rem;
 }
 
 .inner-filter {
@@ -336,6 +343,9 @@ const changeSortOrder = () => {
     justify-content: center;
     gap: 1rem;
     margin-bottom: 2rem;
+    box-sizing: border-box;
+    margin: 0;
+
 }
 
 .menu-title {
@@ -355,6 +365,19 @@ const changeSortOrder = () => {
     border: none;
     background-color: white;
     transition: all 300ms ease-in-out;
+    border: 1px solid rgb(200, 200, 200);
+    appearance: none;
+    -webkit-appearance: none; 
+    -moz-appearance: none; 
+    line-height: 1.5rem;
+    height: 3.5rem;
+    width: 8rem;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='M7 10l5 5 5-5H7z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.5rem;
+    cursor: pointer;
+    box-sizing: border-box;
 }
 
 .menu-select option {
