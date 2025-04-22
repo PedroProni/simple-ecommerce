@@ -25,7 +25,6 @@ const price_range = ref(0);
 const arrow_up = ref(true);
 const selected_sort_option = ref("position");
 const selected_show_option = ref(15);
-const selected_category = ref("all");
 
 onMounted(() => {
     axios.get("http://localhost:3000/products?limit=15").then((response) => {
@@ -38,8 +37,6 @@ onMounted(() => {
 
     axios.get("http://localhost:3000/categories").then((response) => {
         categories.value = response.data;
-    }).then(() => {
-        console.log(categories.value);
     }).catch((error) => {
         toast.error("Error fetching categories:");
         console.error("Error fetching categories:", error);
@@ -48,6 +45,17 @@ onMounted(() => {
 
 const changeSortOrder = () => {
     arrow_up.value = !arrow_up.value;
+}
+
+const filterCategory = (category_code: string) => {
+console.log("CATEGORY CODE", category_code);
+  axios.get(`http://localhost:3000/products?main_category=${category_code}&limit=${selected_show_option}`).then((response) => {
+    products_filtered.value = response.data;
+  }).then(() => {
+    console.log("PRODUTOS CAT:", products_filtered.value);
+  }).catch((error) => {
+    console.error("Error fetching products by category:", error);
+  });
 }
 
 </script>
@@ -70,7 +78,8 @@ const changeSortOrder = () => {
                     <div class="filter-categories">
                         <h3>Categories</h3>
                         <div v-for="category in categories" :key="category.name" class="category">
-                            <a>{{ category.name }}</a>
+                            <input class="category-input" :id="`category-${category.category_code}`" type="radio" :value="category.category_code" @click="filterCategory(category.category_code)"/>
+                            <label :for="`category-${category.category_code}`">{{ category.name }}</label>
                         </div>
                     </div>
                     <div class="filter-price">
@@ -97,9 +106,7 @@ const changeSortOrder = () => {
                     </div>
                     <div class="show">
                         <a class="menu-title">Show:</a>
-                        <select 
-                        class="menu-select"
-                        v-model="selected_show_option">
+                        <select class="menu-select" v-model="selected_show_option">
                             <option value="15">15</option>
                             <option value="30">30</option>
                             <option value="45">45</option>
@@ -197,6 +204,11 @@ const changeSortOrder = () => {
     gap: 1rem;
     border: 0.1rem solid rgb(66, 66, 66, 0.5);
     padding: 1rem;
+}
+
+.category-input {
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .category {
@@ -367,8 +379,8 @@ const changeSortOrder = () => {
     transition: all 300ms ease-in-out;
     border: 1px solid rgb(200, 200, 200);
     appearance: none;
-    -webkit-appearance: none; 
-    -moz-appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
     line-height: 1.5rem;
     height: 3.5rem;
     width: 8rem;
