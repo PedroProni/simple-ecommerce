@@ -48,12 +48,10 @@ const changeSortOrder = () => {
 }
 
 const filterCategory = (category_code: string) => {
-console.log("CATEGORY CODE", category_code);
   axios.get(`http://localhost:3000/products?main_category=${category_code}&limit=${selected_show_option}`).then((response) => {
     products_filtered.value = response.data;
-  }).then(() => {
-    console.log("PRODUTOS CAT:", products_filtered.value);
   }).catch((error) => {
+    toast.error("Error fetching products by category:");
     console.error("Error fetching products by category:", error);
   });
 }

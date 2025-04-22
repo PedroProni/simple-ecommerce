@@ -30,8 +30,6 @@ onMounted(() => {
 
     axios.get("http://localhost:3000/categories").then((response) => {
         categories.value = response.data;
-    }).then(() => {
-        console.log(categories.value);
     }).catch((error) => {
         toast.error("Error fetching categories");
         console.error("Error fetching categories:", error);
@@ -45,7 +43,6 @@ const current_page = ref(1);
 
 
 const filterCategory = (category_code: string) => {
-  console.log(category_code);
   if (category_code === "") {
     current_page.value = 1;
   } else {
@@ -53,9 +50,8 @@ const filterCategory = (category_code: string) => {
   }
   axios.get(`http://localhost:3000/products?main_category=${category_code}&limit=12`).then((response) => {
     products_filtered.value = response.data;
-  }).then(() => {
-    console.log(products_filtered.value);
   }).catch((error) => {
+    toast.error("Error fetching products by category:");
     console.error("Error fetching products by category:", error);
   });
 }
@@ -65,7 +61,6 @@ const getMoreProducts = () => {
   const url = `http://localhost:3000/products?page=${current_page.value}&limit=12`;
 
   axios.get(url).then((response) => {
-    console.log(response.data);
     products_filtered.value.push(...response.data);
   }).catch((error) => {
     console.error("Error fetching more products:", error);
