@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { Model } from 'mongoose';
+import { Model, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { instanceToPlain } from 'class-transformer';
 import { Product } from './entities/product.entity';
@@ -41,34 +41,42 @@ export class ProductsService {
     }
   }
 
-  async findAll(sku, updated_at, main_category, limit = 10, page = 1) {
+  async findAll(sku, updated_at, main_category, limit = 10, page = 1, sort = 'updated_at: -1') {
     try {
+      if (limit > 100) {
+        throw new BadRequestException('Limit cannot be greater than 100');
+      }
+      if (page < 1) {
+        throw new BadRequestException('Page cannot be less than 1');
+      }
+      this.verifySort(sort);
       if (main_category) {
-        return await this.findByCategoryCode(main_category);
+        return await this.findByCategoryCode(main_category, limit, page, sort);
       };
       if (sku) {
-        return await this.findBySKU(sku, limit, page);
+        return await this.findBySKU(sku, limit, page, sort);
       };
       if (updated_at) {
-        return await this.findByUpdatedAt(updated_at, limit, page);
+        return await this.findByUpdatedAt(updated_at, limit, page, sort);
       };
+      const sort_obj = this.mountSort(sort);
       const products = await this.productModel
         .find()
         .populate('stocks')
         .populate('prices')
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ updated_at: -1 })
+        .sort(sort_obj)
         .exec();
       return products.map((product) => {
-        const jsonProduct = product.toJSON();
-        jsonProduct.prices = jsonProduct.prices.map(
+        const json_product = product.toJSON();
+        json_product.prices = json_product.prices.map(
           (price) => new Price(price),
         );
-        jsonProduct.stocks = jsonProduct.stocks.map(
+        json_product.stocks = json_product.stocks.map(
           (stock) => new Stock(stock),
         );
-        return instanceToPlain(new Product(jsonProduct));
+        return instanceToPlain(new Product(json_product));
       });
     } catch (e) {
       await this.handleException(e);
@@ -132,15 +140,16 @@ export class ProductsService {
     return category;
   }
 
-  async findBySKU(sku: string, limit: number, page: number) {
+  async findBySKU(sku: string, limit: number, page: number, sort: string) {
     try {
+      const sort_obj = this.mountSort(sort);
       const product = await this.productModel
         .findOne({ sku: sku })
         .populate('stocks')
         .populate('prices')
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ updated_at: -1 })
+        .sort(sort_obj)
         .exec();
       if (!product) {
         throw new NotFoundException('Product not found');
@@ -151,53 +160,79 @@ export class ProductsService {
     }
   }
 
-  async findByUpdatedAt(updated_at: Date, limit: number, page: number) {
+  async findByUpdatedAt(updated_at: Date, limit: number, page: number, sort: string) {
     try {
+      const sort_obj = this.mountSort(sort);
       const products = await this.productModel
         .find({ updated_at: { $gt: updated_at } })
         .populate('stocks')
         .populate('prices')
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ updated_at: -1 })
+        .sort(sort_obj)
         .exec();
       return products.map((product) => {
-        const jsonProduct = product.toJSON();
-        jsonProduct.prices = jsonProduct.prices.map(
+        const json_product = product.toJSON();
+        json_product.prices = json_product.prices.map(
           (price) => new Price(price),
         );
-        jsonProduct.stocks = jsonProduct.stocks.map(
+        json_product.stocks = json_product.stocks.map(
           (stock) => new Stock(stock),
         );
-        return instanceToPlain(new Product(jsonProduct));
+        return instanceToPlain(new Product(json_product));
       });
     } catch (e) {
       await this.handleException(e);
     }
   }
 
-  async findByCategoryCode(category_code: string,) {
+  async findByCategoryCode(category_code: string, limit: number, page: number, sort: string) {
     try {
+      const sort_obj = this.mountSort(sort);
       const products = await this.productModel
         .find({ main_category: category_code })
         .populate('stocks')
         .populate('prices')
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .sort(sort_obj)
         .exec();
       if (products.length === 0) {
         throw new NotFoundException('Product not found');
       }
       return products.map((product) => {
-        const jsonProduct = product.toJSON();
-        jsonProduct.prices = jsonProduct.prices.map(
+        const json_product = product.toJSON();
+        json_product.prices = json_product.prices.map(
           (price) => new Price(price),
         );
-        jsonProduct.stocks = jsonProduct.stocks.map(
+        json_product.stocks = json_product.stocks.map(
           (stock) => new Stock(stock),
         );
-        return instanceToPlain(new Product(jsonProduct));
+        return instanceToPlain(new Product(json_product));
       });
     } catch (e) {
       await this.handleException(e);
+    }
+  }
+
+  mountSort(sort: string) {
+    const [key, value] = sort.split(':');
+    const obj = { [key.trim()]: parseInt(value.trim()) } as {[x in string]: SortOrder};
+    return obj;
+  }
+
+  verifySort(sort: string) {
+
+    const [key, value, ...rest] = sort.split(':');
+
+    if (!key || !value) {
+      throw new BadRequestException('Sort must be in the format key:value');
+    }
+    if (rest.length > 0) {
+      throw new BadRequestException('Sort must be in the format key:value');
+    }
+    if (value.trim() !== '1' && value.trim() !== '-1') {
+      throw new BadRequestException('Invalid sort value - must be 1 or -1');
     }
   }
 
@@ -212,6 +247,18 @@ export class ProductsService {
     }
     if (e.response?.message === 'Product already exists' || e.code === 11000) {
       throw new ConflictException('Product already exists');
+    }
+    if (e.response?.message === 'Limit cannot be greater than 100') {
+      throw new BadRequestException('Limit cannot be greater than 100');
+    }
+    if (e.response?.message === 'Page cannot be less than 1') {
+      throw new BadRequestException('Page cannot be less than 1');
+    }
+    if (e.response?.message === 'Sort must be in the format key:value') {
+      throw new BadRequestException('Sort must be in the format key:value');
+    }
+    if (e.response?.message === 'Invalid sort value - must be 1 or -1') {
+      throw new BadRequestException('Invalid sort value - must be 1 or -1');
     }
     if (e.errors) {
       const missingFields = Object.keys(e.errors);

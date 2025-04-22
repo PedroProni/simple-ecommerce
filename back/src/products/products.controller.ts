@@ -16,8 +16,8 @@ export class ProductsController {
 
   @Get()
   @Public()
-  findAll(@Query('sku') sku?: string, @Query('updated_at') updated_at?: Date, @Query('limit') limit?:number, @Query('page') page?:number, @Query('main_category') main_category?:string) {
-    return this.productsService.findAll(sku, updated_at, main_category, limit, page);
+  findAll(@Query('sku') sku?: string, @Query('updated_at') updated_at?: Date, @Query('limit') limit?:number, @Query('page') page?:number, @Query('main_category') main_category?:string, @Query('sort') sort?:string) {
+    return this.productsService.findAll(sku, updated_at, main_category, limit, page, sort);
   }
 
   @Get(':id')
