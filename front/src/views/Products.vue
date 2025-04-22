@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
+import axios from "axios";
+import { toast } from "vue3-toastify";
+import Carousel from "../components/Carousel.vue";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faUpLong } from '@fortawesome/free-solid-svg-icons';
-import axios from "axios";
-import { onMounted, ref } from "vue";
-import { toast } from "vue3-toastify";
 
 interface Product {
     name: string;
@@ -25,6 +26,7 @@ const price_range = ref(0);
 const arrow_up = ref(true);
 const selected_sort_option = ref("position");
 const selected_show_option = ref(15);
+
 
 onMounted(() => {
     axios.get("http://localhost:3000/products?limit=15").then((response) => {
@@ -61,6 +63,11 @@ const filterCategory = (category_code: string) => {
 <template>
     <div class="main">
         <div class="black-box"></div>
+        <div class="carousel-c">
+            <div class="carousel">
+                <Carousel />
+            </div>
+        </div>
         <div class="page">
             <div class="page-title">
                 <div class="current-page">
@@ -138,6 +145,24 @@ const filterCategory = (category_code: string) => {
     width: 100%;
     height: 8rem;
     background-color: black;
+}
+
+.carousel-c {
+    width: 100%;
+    height: 40rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.carousel {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
 }
 
 .page {
