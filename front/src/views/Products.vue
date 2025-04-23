@@ -23,9 +23,10 @@ const categories = ref<Category[]>([]);
 const products = ref<Product[]>([]);
 const products_filtered = ref<Product[]>([]);
 const price_range = ref(0);
-const arrow_up = ref(true);
-const selected_sort_option = ref("position");
+const arrow_up = ref(false);
+const selected_sort_option = ref("updated_at");
 const selected_show_option = ref(15);
+const selected_category_option = ref("all");
 
 
 onMounted(() => {
@@ -49,13 +50,15 @@ const changeSortOrder = () => {
     arrow_up.value = !arrow_up.value;
 }
 
-const filterCategory = (category_code: string) => {
-  axios.get(`http://localhost:3000/products?main_category=${category_code}&limit=${selected_show_option}`).then((response) => {
-    products_filtered.value = response.data;
-  }).catch((error) => {
-    toast.error("Error fetching products by category:");
-    console.error("Error fetching products by category:", error);
-  });
+const changeFilters = () => {
+    let category_filter = selected_category_option.value === "all" ? "" : `&main_category=${selected_category_option.value}`;
+    axios.get(`http://localhost:3000/products?sort=${selected_sort_option.value}:${arrow_up.value ? 1 : -1}&limit=${selected_show_option.value}${category_filter}`).then((response) => {
+        console.log(response.data)
+        products_filtered.value = response.data;
+    }).catch((error) => {
+        toast.error("Error fetching products by filters:");
+        console.error("Error fetching products by filters:", error);
+    });
 }
 
 </script>
@@ -82,8 +85,12 @@ const filterCategory = (category_code: string) => {
                 <div class="inner-filter">
                     <div class="filter-categories">
                         <h3>Categories</h3>
+                        <div class="category">
+                            <input class="category-input" id="category-all" type="radio" value="all" v-model="selected_category_option" @change="changeFilters()" />
+                            <label for="category-all">All</label>
+                        </div>
                         <div v-for="category in categories" :key="category.name" class="category">
-                            <input class="category-input" :id="`category-${category.category_code}`" type="radio" :value="category.category_code" @click="filterCategory(category.category_code)"/>
+                            <input class="category-input" :id="`category-${category.category_code}`" type="radio" :value="category.category_code" v-model="selected_category_option" @change="changeFilters()"/>
                             <label :for="`category-${category.category_code}`">{{ category.name }}</label>
                         </div>
                     </div>
@@ -100,18 +107,19 @@ const filterCategory = (category_code: string) => {
                 <div class="toolbar">
                     <div class="sort-by">
                         <a class="menu-title">Sort by:</a>
-                        <select class="menu-select" v-model="selected_sort_option">
-                            <option value="position">Position</option>
+                        <select class="menu-select" v-model="selected_sort_option" @click="changeFilters()">
+                            <option value="updated_at">Position</option>
                             <option value="name">Name</option>
                             <option value="price">Price</option>
                         </select>
-                        <span class="arrow" :class="arrow_up ? 'arrow-up' : 'arrow-down'" @click="changeSortOrder()">
+                        <span class="arrow" :class="arrow_up ? 'arrow-up' : 'arrow-down'" @click="changeSortOrder(), changeFilters()">
                             <FontAwesomeIcon :icon="faUpLong" />
                         </span>
                     </div>
                     <div class="show">
                         <a class="menu-title">Show:</a>
-                        <select class="menu-select" v-model="selected_show_option">
+                        <select class="menu-select" v-model="selected_show_option" @click="changeFilters()"> 
+                            <option value="5">5</option>
                             <option value="15">15</option>
                             <option value="30">30</option>
                             <option value="45">45</option>
@@ -201,7 +209,6 @@ const filterCategory = (category_code: string) => {
 .main-div {
     display: flex;
     flex-direction: row;
-    align-items: center;
     padding: 2rem;
     gap: 2rem;
 }
@@ -212,8 +219,6 @@ const filterCategory = (category_code: string) => {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 2rem;
-    padding: 1rem;
 }
 
 .inner-filter {
@@ -232,14 +237,21 @@ const filterCategory = (category_code: string) => {
 .category-input {
     -webkit-appearance: none;
     appearance: none;
+    cursor: none;
 }
 
 .category {
     display: flex;
     padding: 0.2rem;
-    cursor: pointer;
     color: rgb(63, 63, 63, 1);
     font-weight: 300;
+}
+
+.category label:hover {
+    color: rgb(10, 10, 10);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 300ms ease-in-out;
 }
 
 .filter-price {
@@ -281,7 +293,7 @@ const filterCategory = (category_code: string) => {
     width: 80%;
     min-height: 100vh;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .products-list {
